@@ -412,7 +412,7 @@ function syncPerson(p){
       else if(jv==='No'&&bv==='No'&&(held==='A few hours'||held==='Overnight to a few days'))
         dv.textContent='→ Looks like a "return" (turned around at the border) — generally not a removal bar.';
       else if(stopped==='Unsure'||jv==='Unsure'||bv==='Unsure'||held==='Unsure')
-        dv.textContent='→ Unclear — confirm whether there was a removal order; routing to attorney review to be safe.';
+        dv.textContent='→ Unclear if there was a removal order — they can still book; use non-promissory language (do not promise an outcome) and confirm later via A-number / FOIA.';
       else
         dv.textContent='→ Answer the three questions above and the tool will classify this.';
     }
@@ -514,7 +514,7 @@ function evaluate(){
     actions.push('Flag for attorney: FALSE documents in history — do NOT treat as a simple return; FOIA likely needed (possible expedited removal / fraud). They can still book.');
   }
   if(priorRemoval) flags.push('Prior removal order / 5-year-bar — bar & waiver analysis');
-  else if(unclearStop) flags.push('Immigration stop with unclear outcome — confirm removal order vs. return');
+  else if(unclearStop) actions.push('Removal history unclear — they can still book; do NOT promise an outcome (use the non-promissory wording). Confirm later via A-number / FOIA.');
 
   // court (LA bookable per rule; SF asylum/removal → VH)
   if(m.includes('court')) flags.push('Court/removal case — confirm timeline & capacity');
@@ -537,7 +537,7 @@ function evaluate(){
   let route = office==='SF' ? 'Valencia (VH)' : 'Cynthia (CG)';
   if(office==='SF' && (val('asylum')==='Yes' || m.includes('court'))) route='Valencia (VH) — SF asylum/removal';
 
-  return {outcome,priority,route,paths,flags,blockers,actions,warnings,m,ppl,office};
+  return {outcome,priority,route,paths,flags,blockers,actions,warnings,unclearStop,m,ppl,office};
 }
 
 /* ---------- render verdict ---------- */
@@ -552,7 +552,7 @@ function render(r){
   if(r.paths.length){ html+=`<b style="font-size:12px;color:var(--muted)">Why it may qualify</b><ul class="reasons">${r.paths.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`; }
   if(r.flags.length){ html+=`<b style="font-size:12px;color:var(--muted)">Attorney-review flags</b><ul class="reasons flag">${r.flags.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`; }
   r.actions.forEach(a=> html+=`<div class="action">⚑ ${esc(a)}</div>`);
-  if(r.outcome==='maybe'){
+  if(r.outcome==='maybe' || r.unclearStop){
     html+=`<div class="say"><b>Say it this way (don’t promise an outcome):</b>
       EN: “The attorney can review your situation and explain your options.”<br>
       ES: “La abogada puede revisar su situación y explicarle sus opciones.”</div>`;
