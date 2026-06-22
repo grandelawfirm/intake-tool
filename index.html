@@ -103,6 +103,7 @@
             <label><input type="radio" name="office" value="Main" checked>Main</label>
             <label><input type="radio" name="office" value="NorCal">NorCal</label>
           </div>
+          <div class="small">If current residence, prior residence & referral source conflict, classify by <b>prior residence + referral source</b>.</div>
         </div>
         <div><label>Appointment type</label>
           <select id="apptType"><option>Phone</option><option>Zoom</option><option>In-person</option></select>
@@ -149,6 +150,12 @@
         <label><input type="checkbox" name="matter" value="humanitarian">Humanitarian (U-visa, VAWA, SIJ, asylum, TPS)</label>
         <label><input type="checkbox" name="matter" value="naturalization">Citizenship (N-400)</label>
         <label><input type="checkbox" name="matter" value="i751">Remove conditions (I-751)</label>
+        <label><input type="checkbox" name="matter" value="aos">Adjustment of status (AOS) — incl. old I-130</label>
+        <label><input type="checkbox" name="matter" value="cp">Consular processing / NVC</label>
+        <label><input type="checkbox" name="matter" value="i601a">I-601A waiver</label>
+        <label><input type="checkbox" name="matter" value="foia">FOIA (prior filing/denial)</label>
+        <label><input type="checkbox" name="matter" value="mandamus">Mandamus (delayed case)</label>
+        <label><input type="checkbox" name="matter" value="divorce">Divorce (immigration prerequisite)</label>
         <label><input type="checkbox" name="matter" value="court">Court / removal case</label>
         <label><input type="checkbox" name="matter" value="other">Other</label>
       </div>
@@ -237,6 +244,10 @@
           <div><label>Fear of return, not purely economic?</label><select class="rp" id="asylumFear"><option>Unknown</option><option>Yes</option><option>No</option></select></div>
           <div><label>Already filed?</label><select class="rp" id="asylumFiled"><option>Unknown</option><option>Yes</option><option>No</option></select></div>
         </div>
+        <div class="row">
+          <div><label>Entered &gt; 1 year ago and never filed? <span class="hint">(one-year deadline)</span></label><select class="rp" id="asylumLate"><option>No</option><option>Yes</option></select></div>
+          <div><label>Strong exception to the 1-year deadline?</label><select class="rp" id="asylumException"><option>Unknown</option><option>Yes</option><option>No</option></select></div>
+        </div>
       </div>
     </div>
 
@@ -273,6 +284,33 @@
           <select class="rp" id="sijOrder"><option>No</option><option>Unknown</option><option>Yes — has order</option><option>Not yet — may qualify</option></select></div>
       </div>
       <div class="small">SIJ = under 21 + unmarried + a state juvenile court order finding abuse, abandonment, or neglect by one/both parents. The firm can help with the I-360.</div>
+    </div>
+
+    <div class="card" id="aosCard" style="display:none">
+      <h2>AOS / old I-130 checks</h2>
+      <div class="row">
+        <div><label>Is there a prior/old I-130 (even ~20 yrs old)?</label><select class="rp" id="oldI130"><option>No / Unknown</option><option>Yes</option></select></div>
+        <div><label>Was a prior AOS denied?</label><select class="rp" id="priorAOSDenied"><option>No</option><option>Yes</option></select></div>
+      </div>
+      <div class="small">An old approved/filed I-130 may still support a new AOS. If a prior AOS was denied → FOIA first to learn why, then refile.</div>
+    </div>
+
+    <div class="card" id="divorceCard" style="display:none">
+      <h2>Divorce (immigration prerequisite)</h2>
+      <label>Do they know where the spouse is?</label>
+      <select class="rp" id="spouseLocation"><option>Yes</option><option>No</option></select>
+      <div class="small">If the spouse can't be located → divorce by publication (more complex, but doable).</div>
+    </div>
+
+    <div class="card" id="prereqCard" style="display:none">
+      <h2>Prerequisites outstanding? <span class="hint">(complete before filing)</span></h2>
+      <div class="seg" id="prereqs">
+        <label><input type="checkbox" name="prereq" value="FOIA / FBI fingerprints">FOIA / FBI fingerprints</label>
+        <label><input type="checkbox" name="prereq" value="Expungement before I-601A (e.g., DUI)">Expungement before I-601A (e.g., DUI)</label>
+        <label><input type="checkbox" name="prereq" value="Corrected vital documents">Corrected vital documents</label>
+        <label><input type="checkbox" name="prereq" value="Prior-attorney file / FOIA">Prior-attorney file retrieval</label>
+      </div>
+      <div class="small">If any are open, the next step is to complete the prerequisite first, then proceed.</div>
     </div>
 
     <div class="card" id="courtCard" style="display:none">
@@ -496,7 +534,9 @@ function addPerson(){
     <label>Ever been arrested? <span class="hint">(any country)</span></label>
     <select class="p-arrest"><option>No</option><option>Yes</option></select>
     <div class="pw-arrest" style="display:none"><label>If yes — when, where, why, and what happened?</label>
-      <input type="text" class="p-arrestDetail" placeholder="e.g., 2019, Los Angeles, DUI — case dismissed"></div>`;
+      <input type="text" class="p-arrestDetail" placeholder="e.g., 2019, Los Angeles, DUI — case dismissed">
+      <label>Disposition / type</label>
+      <select class="p-arrestType"><option>—</option><option>DUI</option><option>DV — case closed / administratively closed</option><option>Other</option></select></div>`;
   $('people').appendChild(div);
   syncPerson(div);
 }
@@ -513,7 +553,7 @@ function peopleData(){
     hearing:p.querySelector('.p-hearing').value.trim(), masters:p.querySelector('.p-masters').value.trim(),
     marital:p.querySelector('.p-marital').value.trim(), spouse:p.querySelector('.p-spouse').value.trim(),
     petitions:p.querySelector('.p-petitions').value.trim(), kids:p.querySelector('.p-kids').value.trim(),
-    arrest:p.querySelector('.p-arrest').value, arrestDetail:p.querySelector('.p-arrestDetail').value.trim()
+    arrest:p.querySelector('.p-arrest').value, arrestDetail:p.querySelector('.p-arrestDetail').value.trim(), arrestType:p.querySelector('.p-arrestType').value
   }));
 }
 
@@ -533,6 +573,9 @@ function syncCards(){
   $('asylumCard').style.display = (m.includes('humanitarian') || m.includes('court')) ? '' : 'none';
   $('courtCard').style.display  = m.includes('court') ? '' : 'none';
   $('otherWrap').style.display  = m.includes('other') ? '' : 'none';
+  $('aosCard').style.display     = m.includes('aos') ? '' : 'none';
+  $('divorceCard').style.display = m.includes('divorce') ? '' : 'none';
+  $('prereqCard').style.display  = m.length ? '' : 'none';
   const rrw=$('referReasonWrap'); if(rrw) rrw.style.display = $('wrongArea').checked ? '' : 'none';
 }
 function syncSpouse(){
@@ -655,6 +698,14 @@ function evaluateImmigration(){
     else if(val('condGC')==='Yes' && val('stillMarried')==='No') flags.push('I-751 — no longer married → waiver analysis');
   }
 
+  if(m.includes('aos')){ paths.push('Adjustment of status (AOS)'+(val('oldI130')==='Yes'?' — may use prior/old I-130':'')); if(val('priorAOSDenied')==='Yes') actions.push('Prior AOS denied → FOIA first to learn why, then refile'); }
+  if(m.includes('cp')) paths.push('Consular processing / NVC');
+  if(m.includes('i601a')) paths.push('I-601A provisional waiver');
+  if(m.includes('foia')) paths.push('FOIA — investigate prior filing/denial (~6 months)');
+  if(m.includes('mandamus')){ paths.push('Federal Mandamus — delayed case'); flags.push('Mandamus vs. refile — refiling is often faster; attorney confirms remedy'); }
+  if(m.includes('divorce')){ paths.push('Divorce (immigration prerequisite)'); if(val('spouseLocation')==='No') flags.push('Spouse cannot be located → divorce by publication (more complex but doable)'); }
+  const pre=checks('prereq'); if(pre.length) flags.push('PROCEED AFTER PREREQUISITE — complete first: '+pre.join('; '));
+
   if(m.includes('humanitarian')){
     if(val('sijAge')==='Yes' && val('sijUnmarried')==='Yes' && (val('sijOrder')==='Yes — has order' || val('sijOrder')==='Not yet — may qualify'))
       paths.push('SIJ — under 21, unmarried, juvenile court order (abuse/abandonment/neglect)');
@@ -666,6 +717,7 @@ function evaluateImmigration(){
     if(val('asylumFear')==='Yes'){ paths.push('Asylum — fear-based claim'); flags.push('Asylum strength needs attorney evaluation'); }
     else if(val('asylumFear')==='No') flags.push('Asylum appears economic-only — likely not a qualifying basis');
     if(val('asylumFiled')==='No') actions.push('Asylum NOT filed → email CG for assessment');
+    if(val('asylumLate')==='Yes' && val('asylumException')!=='Yes') flags.push('Asylum 1-year deadline missed, no strong exception — affirmative asylum not advisable; offer a paid strategy session to explain options/risks');
   }
 
   if(multiEWI) flags.push('Multiple TRUE EWI entries — permanent-bar timing analysis needed (capture entry dates & detention)');
@@ -675,7 +727,11 @@ function evaluateImmigration(){
 
   if(m.includes('court')) flags.push('Court/removal case — confirm timeline & capacity');
   if(m.includes('court') && val('outOfStateVenue')==='Yes') flags.push('Out-of-state court venue — attorney review (motion to change venue / can we enter an appearance in time?)');
-  if(ppl.some(p=>p.arrest==='Yes')) flags.push('Arrest / criminal history — attorney review for admissibility & deportability');
+  ppl.filter(p=>p.arrest==='Yes').forEach(p=>{
+    if(p.arrestType==='DUI') flags.push('DUI in history — expungement is a prerequisite before I-601A (send to expungement clinic)');
+    else if((p.arrestType||'').startsWith('DV')) flags.push('DV arrest (case closed) — may proceed + MONITOR the EOIR portal; client should call back if a hearing is added');
+    else flags.push('Arrest / criminal history — attorney review (may need criminal-defense referral) for admissibility & deportability');
+  });
   priorAttyFlag(flags);
 
   let outcome, priority='Standard';
@@ -757,7 +813,8 @@ function render(r){
   const titles={go:'✅ SCHEDULE — clear fit',maybe:'🟡 MAY BOOK — attorney review',no:'❌ REFER OUT — not a fit'};
   v.className='verdict '+r.outcome;
   let html=`<div class="big">${titles[r.outcome]}</div>`;
-  html+=`<div class="meta"><span class="chip">Route: ${esc(r.route)}</span><span class="chip">Priority: ${esc(r.priority)}</span></div>`;
+  const signup = r.outcome==='go' ? 'Sign-up: Coordinator can proceed' : r.outcome==='maybe' ? 'Sign-up: Attorney first' : 'Refer out';
+  html+=`<div class="meta"><span class="chip">Route: ${esc(r.route)}</span><span class="chip">Priority: ${esc(r.priority)}</span><span class="chip">${esc(signup)}</span></div>`;
   if(r.warnings && r.warnings.length){ html+=`<div class="warnbox"><b>⚠ Get this info before finishing:</b><ul>${r.warnings.map(w=>`<li>${esc(w)}</li>`).join('')}</ul></div>`; }
   if(r.blockers.length){ html+=`<ul class="reasons block">${r.blockers.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`; }
   if(r.paths.length){ html+=`<b style="font-size:12px;color:var(--muted)">Why it may qualify</b><ul class="reasons">${r.paths.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`; }
@@ -787,6 +844,7 @@ function noteHead(r, practiceLabel){
   L.push('');
   const titles={go:'✅ SCHEDULE',maybe:'🟡 MAY BOOK — attorney review',no:'❌ REFER OUT'};
   L.push(`QUALIFIER RESULT: ${titles[r.outcome]}  |  ROUTE TO: ${r.route}  |  PRIORITY: ${r.priority}`);
+  L.push(`  Sign-up: ${r.outcome==='go'?'Coordinator can proceed':r.outcome==='maybe'?'Attorney first':'Refer out'}`);
   if(r.paths.length) L.push(`  Qualifying: ${r.paths.join('; ')}`);
   if(r.flags.length) L.push(`  Flags: ${r.flags.join('; ')}`);
   if(r.blockers.length) L.push(`  Refer-out reason: ${r.blockers.join('; ')}`);
@@ -814,7 +872,7 @@ function noteFoot(L){
 
 function buildNoteImmigration(r){
   const L=noteHead(r,'Immigration');
-  const mt = r.m.map(x=>({familyBased:'Legalize status (family-based)',humanitarian:'Humanitarian (U-visa/VAWA/SIJ/asylum/TPS)',naturalization:'Citizenship (N-400)',i751:'Remove conditions (I-751)',court:'Court/removal',other:'Other: '+val('otherDesc')}[x])).join(', ');
+  const mt = r.m.map(x=>({familyBased:'Legalize status (family-based)',humanitarian:'Humanitarian (U-visa/VAWA/SIJ/asylum/TPS)',naturalization:'Citizenship (N-400)',i751:'Remove conditions (I-751)',aos:'Adjustment of status (AOS)',cp:'Consular processing / NVC',i601a:'I-601A waiver',foia:'FOIA',mandamus:'Mandamus',divorce:'Divorce (prerequisite)',court:'Court/removal',other:'Other: '+val('otherDesc')}[x])).join(', ');
   L.push(`Type of help: ${mt}`);
   if(val('detained')==='Yes') L.push('DETAINED / bond matter: YES — refer out');
   L.push('');
@@ -834,7 +892,7 @@ function buildNoteImmigration(r){
     if(p.spouse) L.push(`Spouse/partner: ${p.spouse}`);
     if(p.petitions) L.push(`Prior petitions filed? ${p.petitions}`);
     if(p.kids) L.push(`Children: ${p.kids}`);
-    if(p.arrest==='Yes') L.push(`Arrested: YES — ${p.arrestDetail||'(get when/where/why/outcome)'}`);
+    if(p.arrest==='Yes') L.push(`Arrested: YES${p.arrestType&&p.arrestType!=='—'?' ('+p.arrestType+')':''} — ${p.arrestDetail||'(get when/where/why/outcome)'}`);
     L.push('');
   });
   L.push('— Relief / screening —');
@@ -852,11 +910,14 @@ function buildNoteImmigration(r){
   if(val('voc')!=='No') L.push(`VOC: ${val('voc')} · where? ${val('vocWhere')} · ${val('vocBorderline')} · reported? ${val('vocReported')}${val('vocDetails')?' · '+val('vocDetails'):''}`);
   rp('245(i) derivative (spouse/parent)','spouse245i');
   if(val('p245iDate') && (val('p245i')!=='No'||val('spouse245i')!=='No')) L.push(`245(i) petition filed: ${val('p245iDate')}`);
-  if(val('asylum')==='Yes') L.push(`Asylum: Yes · fear (not economic)? ${val('asylumFear')} · filed? ${val('asylumFiled')}`);
+  if(val('asylum')==='Yes') L.push(`Asylum: Yes · fear ${val('asylumFear')} · filed ${val('asylumFiled')} · >1yr-late ${val('asylumLate')} · exception ${val('asylumException')}`);
   if(r.m.includes('naturalization')) L.push(`N-400: LPR ${val('lprTime')} · trip>6mo ${val('trips6')} · taxes ${val('taxes')} · arrests ${val('arrests')} · claimed USC/voted ${val('falseUSC')}`);
   if(r.m.includes('i751')) L.push(`I-751: conditional GC ${val('condGC')} · still married ${val('stillMarried')} · expiring ${val('expiring')}`);
   if(r.m.includes('humanitarian') && val('sijAge')!=='Unknown') L.push(`SIJ: under 21 ${val('sijAge')} · unmarried ${val('sijUnmarried')} · juvenile court order ${val('sijOrder')}`);
   if(r.m.includes('court')) L.push(`Court venue out-of-state? ${val('outOfStateVenue')}`);
+  if(r.m.includes('aos')) L.push(`AOS: old I-130 ${val('oldI130')} · prior AOS denied ${val('priorAOSDenied')}`);
+  if(r.m.includes('divorce')) L.push(`Divorce prereq: know spouse location? ${val('spouseLocation')}`);
+  if(checks('prereq').length) L.push(`Prerequisites outstanding: ${checks('prereq').join(', ')}`);
   noteFoot(L);
   return L.join('\n');
 }
@@ -908,7 +969,7 @@ function collectState(){
   const s={};
   document.querySelectorAll('input[id],select[id],textarea[id]').forEach(el=>{ s[el.id]= el.type==='checkbox'?el.checked:el.value; });
   s.__practice=radio('practice'); s.__office=radio('office');
-  s.__matters=matters(); s.__bkDebtType=checks('bkDebtType'); s.__epNeed=checks('epNeed');
+  s.__matters=matters(); s.__prereq=checks('prereq'); s.__bkDebtType=checks('bkDebtType'); s.__epNeed=checks('epNeed');
   s.__people=peopleData();
   return s;
 }
@@ -921,13 +982,13 @@ function applyState(s){
     set('.p-stopped',pd.stopped);set('.p-judge',pd.judge);set('.p-bar',pd.bar);set('.p-held',pd.held);set('.p-false',pd.false);
     set('.p-anum',pd.anum);set('.p-hearing',pd.hearing);set('.p-masters',pd.masters);
     set('.p-marital',pd.marital);set('.p-spouse',pd.spouse);set('.p-petitions',pd.petitions);set('.p-kids',pd.kids);
-    set('.p-arrest',pd.arrest);set('.p-arrestDetail',pd.arrestDetail);
+    set('.p-arrest',pd.arrest);set('.p-arrestDetail',pd.arrestDetail);set('.p-arrestType',pd.arrestType);
   });
   if(!$('people').children.length) addPerson();
   Object.keys(s).forEach(k=>{ if(k.startsWith('__'))return; const el=$(k); if(!el)return; if(el.type==='checkbox')el.checked=!!s[k]; else el.value=s[k]; });
   const setRadio=(nm,v)=>{ if(v){ const o=document.querySelector('input[name="'+nm+'"][value="'+v+'"]'); if(o)o.checked=true; } };
   setRadio('practice',s.__practice); setRadio('office',s.__office);
-  [['matter','__matters'],['bkDebtType','__bkDebtType'],['epNeed','__epNeed']].forEach(([nm,key])=>{
+  [['matter','__matters'],['prereq','__prereq'],['bkDebtType','__bkDebtType'],['epNeed','__epNeed']].forEach(([nm,key])=>{
     document.querySelectorAll('input[name="'+nm+'"]').forEach(c=>{ c.checked=(s[key]||[]).includes(c.value); });
   });
   syncAll();
