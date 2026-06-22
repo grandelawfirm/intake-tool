@@ -237,6 +237,8 @@
         </div>
         <label>What was the crime, when did it happen, and what was the outcome?</label>
         <input type="text" id="vocDetails" placeholder="e.g., assault in 2021; reported to LAPD; suspect charged / case closed">
+        <label>Do they have a copy of the police report? <span class="hint">(if yes, ask them to send it in advance if possible)</span></label>
+        <select id="vocPoliceReport"><option>Unknown</option><option>Yes</option><option>No</option></select>
       </div>
     </div>
 
@@ -684,6 +686,7 @@ function evaluateImmigration(){
     else if(val('vocReported')==='Yes') paths.push('U-visa — qualifying crime in the U.S., reported to authorities');
     else flags.push('Crime victim but report NOT confirmed — verify (a police-report copy is not always required; confirm the agency process)');
     if((voc.includes('child')||voc.includes('spouse')) && val('vocWhere')!=='Abroad') paths.push('Derivative U-visa through relative who was the crime victim');
+    if(val('vocPoliceReport')==='Yes') actions.push('Ask the PNC to send the police report in advance if possible');
   }
   if(val('inRemoval')==='Yes'){ paths.push('In removal proceedings — relief may be available in court'); flags.push('In court — capture A-number & hearing dates'); }
 
@@ -910,7 +913,7 @@ function buildNoteImmigration(r){
   rp('245(i) own petition','p245i'); rp('Military family','military'); rp('DACA/TPS + advance parole','dacaAP');
   rp('In removal proceedings','inRemoval'); rp('VAWA abuse','vawa');
   if(val('vawa')==='Yes') L.push(`VAWA abuse details: ${val('vawaDetails')||'—'}`);
-  if(val('voc')!=='No') L.push(`VOC: ${val('voc')} · where? ${val('vocWhere')} · ${val('vocBorderline')} · reported? ${val('vocReported')}${val('vocDetails')?' · '+val('vocDetails'):''}`);
+  if(val('voc')!=='No') L.push(`VOC: ${val('voc')} · where? ${val('vocWhere')} · ${val('vocBorderline')} · reported? ${val('vocReported')}${val('vocDetails')?' · '+val('vocDetails'):''}${val('vocPoliceReport')&&val('vocPoliceReport')!=='Unknown'?' · police report? '+val('vocPoliceReport'):''}`);
   rp('245(i) derivative (spouse/parent)','spouse245i');
   if(val('p245iDate') && (val('p245i')!=='No'||val('spouse245i')!=='No')) L.push(`245(i) petition filed: ${val('p245iDate')}`);
   if(val('asylum')==='Yes') L.push(`Asylum: Yes · fear ${val('asylumFear')} · filed ${val('asylumFiled')} · >1yr-late ${val('asylumLate')} · exception ${val('asylumException')}`);
