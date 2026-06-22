@@ -626,7 +626,7 @@ document.addEventListener('input', liveRun);
 /* ---------- shared helpers ---------- */
 function priorAttyFlag(flags){ const pa=val('priorAtty'); if(pa && !/^none$|^n\/?a$|^no$/i.test(pa)) flags.push('Prior/current attorney ("'+pa+'") — verify representation status before proceeding'); }
 function routeFor(office){ return office==='NorCal' ? 'Valencia (VH)' : 'Cynthia (CG)'; }
-const REFERRALS={detention:'Detention specialist — Yolanda Martin, 818-231-5993 (verify)',ch11:'Chapter 11 / high-asset — Roksana Moradi-Brovia, rhmfirm.com (verify)','Prenup':'Prenup — marmolejolaw.com (verify)','Out-of-state':'Out-of-state — use the out-of-town attorney list','Criminal defense':'Criminal-defense referral (confirm w/ attorney)'};
+const REFERRALS={detention:'refer using the Team 100 list (detention / bond specialist)',ch11:'refer using the Team 100 list (Chapter 11 / high-asset attorney)','Prenup':'refer using the Team 100 list (prenup attorney)','Out-of-state':'refer using the Team 100 list (out-of-state attorney)','Criminal defense':'refer using the Team 100 list (criminal-defense attorney)'};
 
 /* ================= IMMIGRATION ENGINE ================= */
 function evaluateImmigration(){
