@@ -171,16 +171,21 @@
         </div>
       </div>
       <div class="row">
-        <div><label>245(i)? <span class="hint">entry & petition before 4/30/2001</span></label>
+        <div><label>245(i) — PNC's own entry & petition before 4/30/2001?</label>
           <select class="rp" id="p245i"><option>No</option><option>Unknown</option><option>Yes</option></select></div>
-        <div><label>Spouse/adult child in U.S. military?</label>
-          <select class="rp" id="military"><option>No</option><option>Unknown</option><option>Yes</option></select></div>
+        <div><label>245(i) via spouse <span class="hint">(spouse's petition via sibling/USC parent) AND visa now available?</span></label>
+          <select class="rp" id="spouse245i"><option>No</option><option>Unknown</option><option>Yes</option></select></div>
       </div>
       <div class="row">
+        <div><label>Spouse/adult child in U.S. military?</label>
+          <select class="rp" id="military"><option>No</option><option>Unknown</option><option>Yes</option></select></div>
         <div><label>DACA/TPS + traveled on advance parole & re-entered?</label>
           <select class="rp" id="dacaAP"><option>No</option><option>Unknown</option><option>Yes</option></select></div>
+      </div>
+      <div class="row">
         <div><label>Currently in removal proceedings?</label>
           <select class="rp" id="inRemoval"><option>No</option><option>Yes</option></select></div>
+        <div></div>
       </div>
       <label>Abuse — verbal/emotional, financial, or physical — by a USC/LPR spouse, parent, or adult (21+) USC child? <span class="hint">VAWA self-petition</span></label>
       <select class="rp" id="vawa"><option>No</option><option>Yes</option></select>
@@ -196,8 +201,6 @@
         <label>What was the crime, when did it happen, and what was the outcome?</label>
         <input type="text" id="vocDetails" placeholder="e.g., assault in 2021; reported to LAPD; suspect charged / case closed">
       </div>
-      <label>Spouse has a 245(i) petition (via sibling/USC parent) AND a visa is now available?</label>
-      <select class="rp" id="spouse245i"><option>No</option><option>Unknown</option><option>Yes</option></select>
     </div>
 
     <div class="card" id="asylumCard" style="display:none">
