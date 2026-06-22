@@ -530,7 +530,7 @@ function addPerson(){
       <div><label>Marital status <span class="hint">(single / married since… / unmarried partner)</span></label><input type="text" class="p-marital" placeholder="Married since 2012 / single / partner (not married)"></div>
       <div><label>Spouse / partner — name &amp; immigration status <span class="hint">(USC / LPR / DACA / undoc.)</span></label><input type="text" class="p-spouse" placeholder="e.g., Ana Cano — DACA recipient"></div>
     </div>
-    <label>Prior petitions filed? <span class="hint">(type, year, outcome)</span></label><input type="text" class="p-petitions">
+    <label>Prior petitions or applications filed with immigration? <span class="hint">(type, year, outcome)</span></label><input type="text" class="p-petitions">
     <label>Children? (#, ages, country of birth — and is any child a U.S. citizen 21+?)</label>
     <input type="text" class="p-kids" placeholder="e.g., 2 kids (13, 11) born in U.S. — or: son 24, USC">
     <label>Ever been arrested? <span class="hint">(any country)</span></label>
@@ -896,7 +896,7 @@ function buildNoteImmigration(r){
     if(p.hearing||p.masters) L.push(`Hearing info: ${p.hearing}${p.masters?' · # masters: '+p.masters:''}`);
     if(p.marital) L.push(`Marital status: ${p.marital}`);
     if(p.spouse) L.push(`Spouse/partner: ${p.spouse}`);
-    if(p.petitions) L.push(`Prior petitions filed? ${p.petitions}`);
+    if(p.petitions) L.push(`Prior petitions or applications filed with immigration? ${p.petitions}`);
     if(p.kids) L.push(`Children: ${p.kids}`);
     if(p.arrest==='Yes') L.push(`Arrested: YES — ${p.arrestDetail||'(get when/where/why/outcome)'}${p.arrestDocs&&p.arrestDocs!=='Unknown'?' · court records/docs: '+p.arrestDocs:''} · FOIA/FBI check done? ${p.foiaDone} · pulled FBI/Live Scan (personal)? ${p.fbiPulled}`);
     L.push('');
