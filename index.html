@@ -90,9 +90,9 @@
       <h2>Call basics</h2>
       <div class="row3">
         <div><label>Office</label>
-          <div class="seg" data-name="office">
-            <label><input type="radio" name="office" value="LA" checked>LA</label>
-            <label><input type="radio" name="office" value="SF">SF</label>
+          <div class="seg" data-name="office" data-renamed="main-norcal">
+            <label><input type="radio" name="office" value="Main" checked>Main</label>
+            <label><input type="radio" name="office" value="NorCal">NorCal</label>
           </div>
         </div>
         <div><label>Appointment type</label>
@@ -526,7 +526,7 @@ function evaluate(){
   if(priorRemoval) flags.push('Prior removal order / 5-year-bar — bar & waiver analysis');
   else if(unclearStop) actions.push('Removal history unclear — they can still book; do NOT promise an outcome (use the non-promissory wording). Confirm later via A-number / FOIA.');
 
-  // court (LA bookable per rule; SF asylum/removal → VH)
+  // court (Main bookable per rule; NorCal asylum/removal → VH)
   if(m.includes('court')) flags.push('Court/removal case — confirm timeline & capacity');
 
   // prior attorney (flag, never blocks)
@@ -544,8 +544,8 @@ function evaluate(){
 
   // routing
   const office = radio('office');
-  let route = office==='SF' ? 'Valencia (VH)' : 'Cynthia (CG)';
-  if(office==='SF' && (val('asylum')==='Yes' || m.includes('court'))) route='Valencia (VH) — SF asylum/removal';
+  let route = office==='NorCal' ? 'Valencia (VH)' : 'Cynthia (CG)';
+  if(office==='NorCal' && (val('asylum')==='Yes' || m.includes('court'))) route='Valencia (VH) — NorCal asylum/removal';
 
   return {outcome,priority,route,paths,flags,blockers,actions,warnings,unclearStop,m,ppl,office};
 }
@@ -653,7 +653,7 @@ function buildNote(r){
 
 function run(){ const r=evaluate(); render(r); $('note').value=buildNote(r); }
 function copyNote(b){ const t=$('note'); if(!t.value) return; navigator.clipboard.writeText(t.value).then(()=>{ const o=b.textContent; b.textContent='✓ Copied'; setTimeout(()=>b.textContent=o,1200); }); }
-function resetAll(){ if(!confirm('Clear everything and start a new PNC?')) return; document.querySelectorAll('input,select,textarea').forEach(el=>{ if(el.type==='checkbox'||el.type==='radio'){ el.checked = (el.value==='LA'||el.value==='The caller'); } else el.value=''; }); document.querySelectorAll('select').forEach(s=>s.selectedIndex=0); $('people').innerHTML=''; pCount=0; addPerson(); syncAll(); $('verdict').className='verdict empty'; $('verdict').innerHTML='<div class="big">Awaiting input</div><div>Fill the form and press <b>Get recommendation</b>.</div>'; $('note').value=''; clearDraft(); }
+function resetAll(){ if(!confirm('Clear everything and start a new PNC?')) return; document.querySelectorAll('input,select,textarea').forEach(el=>{ if(el.type==='checkbox'||el.type==='radio'){ el.checked = (el.value==='Main'); } else el.value=''; }); document.querySelectorAll('select').forEach(s=>s.selectedIndex=0); $('people').innerHTML=''; pCount=0; addPerson(); syncAll(); $('verdict').className='verdict empty'; $('verdict').innerHTML='<div class="big">Awaiting input</div><div>Fill the form and press <b>Get recommendation</b>.</div>'; $('note').value=''; clearDraft(); }
 
 /* ---------- draft auto-save (local only, never uploaded) ---------- */
 const DRAFT_KEY='gl_immig_draft_v1';
