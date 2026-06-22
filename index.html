@@ -138,6 +138,11 @@
     <!-- ============ IMMIGRATION MODULE ============ -->
     <div id="mod-immigration">
     <div class="card">
+      <h2>Quick screen</h2>
+      <label>Is the person currently in ICE detention, or is this a bond / "locate a detained relative" matter?</label>
+      <select class="rp" id="detained"><option>No</option><option>Yes</option></select>
+    </div>
+    <div class="card">
       <h2>What kind of help? <span class="hint">(check all that apply)</span></h2>
       <div class="seg" id="matterTypes">
         <label><input type="checkbox" name="matter" value="familyBased">Legalize status (family-based)</label>
@@ -149,6 +154,8 @@
       </div>
       <div id="otherWrap" style="display:none"><label>Describe "other"</label><input type="text" id="otherDesc"></div>
       <label style="margin-top:12px"><input type="checkbox" id="wrongArea"> This matter is outside our practice areas (refer out)</label>
+      <div id="referReasonWrap" style="display:none"><label>Refer-out reason <span class="hint">(surfaces the right referral)</span></label>
+        <select id="referReason"><option>—</option><option>Prenup</option><option>Out-of-state</option><option>Criminal defense</option><option>Other</option></select></div>
     </div>
 
     <div class="card">
@@ -213,6 +220,10 @@
       <div id="vocReportedWrap" style="display:none">
         <label>Was it reported to a government agency? <span class="hint">(required for U-visa)</span></label>
         <select class="rp" id="vocReported"><option>Unknown</option><option>Yes</option><option>No</option></select>
+        <div class="row">
+          <div><label>Where did the crime happen?</label><select id="vocWhere"><option>In the U.S.</option><option>Abroad</option><option>Unknown</option></select></div>
+          <div><label>Crime type — clear or borderline? <span class="hint">(e.g., school incident, indirect = borderline)</span></label><select id="vocBorderline"><option>Clear qualifying crime</option><option>Borderline / unclear</option></select></div>
+        </div>
         <label>What was the crime, when did it happen, and what was the outcome?</label>
         <input type="text" id="vocDetails" placeholder="e.g., assault in 2021; reported to LAPD; suspect charged / case closed">
       </div>
@@ -268,6 +279,9 @@
       <h2>Court / removal checks</h2>
       <label>Is the <b>individual hearing</b> less than 1 month away? <span class="hint">(if yes → too late)</span></label>
       <select class="rp" id="indHearingSoon"><option>No / N/A</option><option>Yes</option></select>
+      <label>Is the immigration court hearing in another state?</label>
+      <select class="rp" id="outOfStateVenue"><option>No / N/A</option><option>Yes</option></select>
+      <div class="small">Always pull the A-number on the EOIR portal (acis.eoir.justice.gov) to confirm the real next hearing date & location before deciding.</div>
       <div class="small">Capture exact hearing dates & # of master hearings in the person block above.</div>
     </div>
     </div><!-- /mod-immigration -->
@@ -334,6 +348,17 @@
           <div><label>Annual income reported on taxes <span class="hint">(for ARAG)</span></label><input type="text" id="bkAnnualIncome" placeholder="$ / year (or NA)"></div>
         </div>
         <div id="bkPriorWrap" style="display:none"><label>When did they file, and under which chapter?</label><input type="text" id="bkPriorDetail" placeholder="e.g., Chapter 7 in 2016"></div>
+      </div>
+
+      <div class="card">
+        <h2>Bankruptcy — asset screen (Chapter 7)</h2>
+        <div class="row">
+          <div><label>High-value or non-exemptable assets? <span class="hint">(multiple vehicles, high-value property)</span></label><select id="bkAssets"><option>No</option><option>Yes</option><option>Unsure</option></select></div>
+          <div><label>Recent large asset sale? <span class="hint">(proceeds may be too recent)</span></label><select id="bkAssetSale"><option>No</option><option>Yes</option></select></div>
+        </div>
+        <label>Chapter 11 territory? <span class="hint">(very high assets AND debts)</span></label>
+        <select id="bkCh11"><option>No</option><option>Yes</option></select>
+        <div class="small">We take Chapter 7 only when assets can be exempted. High-value/non-exemptable assets or a recent large sale → bankruptcy-team review. Chapter 11 / heavy assets → refer out.</div>
       </div>
     </div><!-- /mod-bankruptcy -->
 
@@ -508,6 +533,7 @@ function syncCards(){
   $('asylumCard').style.display = (m.includes('humanitarian') || m.includes('court')) ? '' : 'none';
   $('courtCard').style.display  = m.includes('court') ? '' : 'none';
   $('otherWrap').style.display  = m.includes('other') ? '' : 'none';
+  const rrw=$('referReasonWrap'); if(rrw) rrw.style.display = $('wrongArea').checked ? '' : 'none';
 }
 function syncSpouse(){
   const mt=val('marriedTo');
@@ -564,6 +590,7 @@ document.addEventListener('input', liveRun);
 /* ---------- shared helpers ---------- */
 function priorAttyFlag(flags){ const pa=val('priorAtty'); if(pa && !/^none$|^n\/?a$|^no$/i.test(pa)) flags.push('Prior/current attorney ("'+pa+'") — verify representation status before proceeding'); }
 function routeFor(office){ return office==='NorCal' ? 'Valencia (VH)' : 'Cynthia (CG)'; }
+const REFERRALS={detention:'Detention specialist — Yolanda Martin, 818-231-5993 (verify)',ch11:'Chapter 11 / high-asset — Roksana Moradi-Brovia, rhmfirm.com (verify)','Prenup':'Prenup — marmolejolaw.com (verify)','Out-of-state':'Out-of-state — use the out-of-town attorney list','Criminal defense':'Criminal-defense referral (confirm w/ attorney)'};
 
 /* ================= IMMIGRATION ENGINE ================= */
 function evaluateImmigration(){
@@ -573,7 +600,8 @@ function evaluateImmigration(){
   if(!val('source')) warnings.push('Source is blank — capture how they heard about us');
   if(ppl.some(p=>p.entry==='With visa / inspected' && p.overstay==='Unknown')) warnings.push('Visa overstay is Unknown — confirm whether they overstayed');
 
-  if($('wrongArea').checked) blockers.push('Matter is outside the firm’s practice areas');
+  if(val('detained')==='Yes') blockers.push('Detention / bond matter — we do not handle these. Refer: '+REFERRALS.detention);
+  if($('wrongArea').checked){ const rr=val('referReason'); blockers.push('Matter is outside the firm’s practice areas'+(rr && rr!=='—' ? ' → Refer: '+(REFERRALS[rr]||rr) : '')); }
   if(val('conflict')==='Yes') blockers.push('Definite conflict of interest');
   if(m.includes('court') && val('indHearingSoon')==='Yes')
     blockers.push('Individual hearing is under 1 month away — too late to prepare');
@@ -601,9 +629,11 @@ function evaluateImmigration(){
 
   const voc = val('voc');
   if(voc && voc!=='No'){
-    if(val('vocReported')==='Yes') paths.push('U-visa — crime victim, reported to authorities');
-    else flags.push('Crime victim but report to a government agency NOT confirmed — verify (no report = may not qualify)');
-    if(voc.includes('child')||voc.includes('spouse')) paths.push('Derivative U-visa through relative who was the crime victim');
+    if(val('vocWhere')==='Abroad') flags.push('Crime occurred ABROAD — does not qualify for a U-visa (check other paths)');
+    else if(val('vocBorderline')==='Borderline / unclear') flags.push('Borderline U-visa crime (e.g., school / indirect) — attorney review; we can often try, but be transparent it may be difficult');
+    else if(val('vocReported')==='Yes') paths.push('U-visa — qualifying crime in the U.S., reported to authorities');
+    else flags.push('Crime victim but report NOT confirmed — verify (a police-report copy is not always required; confirm the agency process)');
+    if((voc.includes('child')||voc.includes('spouse')) && val('vocWhere')!=='Abroad') paths.push('Derivative U-visa through relative who was the crime victim');
   }
   if(val('inRemoval')==='Yes'){ paths.push('In removal proceedings — relief may be available in court'); flags.push('In court — capture A-number & hearing dates'); }
 
@@ -644,6 +674,7 @@ function evaluateImmigration(){
   else if(unclearStop) actions.push('Removal history unclear — they can still book; do NOT promise an outcome (use the non-promissory wording). Confirm later via A-number / FOIA.');
 
   if(m.includes('court')) flags.push('Court/removal case — confirm timeline & capacity');
+  if(m.includes('court') && val('outOfStateVenue')==='Yes') flags.push('Out-of-state court venue — attorney review (motion to change venue / can we enter an appearance in time?)');
   if(ppl.some(p=>p.arrest==='Yes')) flags.push('Arrest / criminal history — attorney review for admissibility & deportability');
   priorAttyFlag(flags);
 
@@ -684,6 +715,9 @@ function evaluateBankruptcy(){
 
   if(office==='NorCal' && val('bkHousing')==='Own') flags.push('NorCal homeowner — if this becomes a Chapter 13, refer out; confirm with VH');
   if(val('bkPrior')==='Yes') flags.push('Filed bankruptcy before — confirm timing before refiling (Ch.7 ~8 yrs; Ch.13 varies)');
+  if(val('bkCh11')==='Yes') blockers.push('Chapter 11 / heavy assets & debts — refer out. '+REFERRALS.ch11);
+  if(val('bkAssets')==='Yes' || val('bkAssetSale')==='Yes') flags.push('Asset-exemption review by bankruptcy team — may not be a Ch.7 fit (high-value/non-exemptable assets or recent large sale)');
+  else if(val('bkAssets')==='Unsure') flags.push('Confirm assets are exemptable — Ch.7 only works if assets can be exempted');
   priorAttyFlag(flags);
 
   let outcome, priority='Standard';
@@ -782,6 +816,7 @@ function buildNoteImmigration(r){
   const L=noteHead(r,'Immigration');
   const mt = r.m.map(x=>({familyBased:'Legalize status (family-based)',humanitarian:'Humanitarian (U-visa/VAWA/SIJ/asylum/TPS)',naturalization:'Citizenship (N-400)',i751:'Remove conditions (I-751)',court:'Court/removal',other:'Other: '+val('otherDesc')}[x])).join(', ');
   L.push(`Type of help: ${mt}`);
+  if(val('detained')==='Yes') L.push('DETAINED / bond matter: YES — refer out');
   L.push('');
   r.ppl.forEach((p,i)=>{
     L.push(`— Applicant ${i+1}${p.name?': '+p.name:''} —`);
@@ -814,13 +849,14 @@ function buildNoteImmigration(r){
   rp('245(i) own petition','p245i'); rp('Military family','military'); rp('DACA/TPS + advance parole','dacaAP');
   rp('In removal proceedings','inRemoval'); rp('VAWA abuse','vawa');
   if(val('vawa')==='Yes') L.push(`VAWA abuse details: ${val('vawaDetails')||'—'}`);
-  if(val('voc')!=='No') L.push(`VOC: ${val('voc')} · reported? ${val('vocReported')}${val('vocDetails')?' · '+val('vocDetails'):''}`);
+  if(val('voc')!=='No') L.push(`VOC: ${val('voc')} · where? ${val('vocWhere')} · ${val('vocBorderline')} · reported? ${val('vocReported')}${val('vocDetails')?' · '+val('vocDetails'):''}`);
   rp('245(i) derivative (spouse/parent)','spouse245i');
   if(val('p245iDate') && (val('p245i')!=='No'||val('spouse245i')!=='No')) L.push(`245(i) petition filed: ${val('p245iDate')}`);
   if(val('asylum')==='Yes') L.push(`Asylum: Yes · fear (not economic)? ${val('asylumFear')} · filed? ${val('asylumFiled')}`);
   if(r.m.includes('naturalization')) L.push(`N-400: LPR ${val('lprTime')} · trip>6mo ${val('trips6')} · taxes ${val('taxes')} · arrests ${val('arrests')} · claimed USC/voted ${val('falseUSC')}`);
   if(r.m.includes('i751')) L.push(`I-751: conditional GC ${val('condGC')} · still married ${val('stillMarried')} · expiring ${val('expiring')}`);
   if(r.m.includes('humanitarian') && val('sijAge')!=='Unknown') L.push(`SIJ: under 21 ${val('sijAge')} · unmarried ${val('sijUnmarried')} · juvenile court order ${val('sijOrder')}`);
+  if(r.m.includes('court')) L.push(`Court venue out-of-state? ${val('outOfStateVenue')}`);
   noteFoot(L);
   return L.join('\n');
 }
@@ -842,6 +878,7 @@ function buildNoteBankruptcy(r){
   if(val('bkVehicles')) L.push(`Vehicles: ${val('bkVehicles')}`);
   L.push(`Total debt: ${val('bkDebtAmt')||'(blank)'} · types: ${checks('bkDebtType').join(', ')||'—'}`);
   L.push(`Lawsuits / garnishments? ${val('bkGarnish')}`);
+  L.push(`Asset screen: high-value/non-exemptable ${val('bkAssets')} · recent large sale ${val('bkAssetSale')} · Chapter 11 territory ${val('bkCh11')}`);
   if(val('bkAnnualIncome')) L.push(`Annual income on taxes (ARAG): ${val('bkAnnualIncome')}`);
   noteFoot(L);
   return L.join('\n');
