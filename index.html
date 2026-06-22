@@ -354,13 +354,13 @@
           <div><label>Own real property?</label><select id="epRealProp"><option>No</option><option>Yes</option><option>Unknown</option></select></div>
         </div>
         <label>Minor children (may need guardianship)?</label><select id="epMinors"><option>No</option><option>Yes</option></select>
-        <label style="margin-top:14px">Refer-out / escalate situations <span class="hint">(DRAFT — confirm with CG)</span></label>
-        <div class="seg" id="epReferOuts">
-          <label><input type="checkbox" name="epReferOut" value="Active probate litigation / will contest">Active probate litigation / will contest</label>
-          <label><input type="checkbox" name="epReferOut" value="Very high net worth / complex tax planning">Very high net worth / complex tax planning</label>
-          <label><input type="checkbox" name="epReferOut" value="Business succession / complex entities">Business succession / complex entities</label>
+        <div class="row">
+          <div><label>Is the matter contested or disputed? <span class="hint">(will contest, family dispute, litigation)</span></label>
+            <select id="epContested"><option>No</option><option>Yes</option></select></div>
+          <div><label>Emergency — needed in less than a week?</label>
+            <select id="epEmergency"><option>No</option><option>Yes</option></select></div>
         </div>
-        <div class="small">Estate planning books most inquiries. The boxes above are <b>placeholder</b> refer-outs — tell CG which situations should actually refer out and they'll be locked in.</div>
+        <div class="small">We take <b>simple</b> wills / living-trust / estate-planning needs. <b>Contested</b> matters and <b>emergencies (under a week)</b> refer out.</div>
       </div>
     </div><!-- /mod-estate -->
 
@@ -695,15 +695,15 @@ function evaluateEstate(){
   if(!val('source')) warnings.push('Source is blank — capture how they heard about us');
   if(val('conflict')==='Yes') blockers.push('Definite conflict of interest');
 
-  checks('epReferOut').forEach(x=>blockers.push('Estate-planning refer-out (DRAFT, confirm w/ CG): '+x));
+  if(val('epContested')==='Yes') blockers.push('Contested / disputed matter — refer out (we take simple, uncontested estate planning)');
+  if(val('epEmergency')==='Yes') blockers.push('Emergency — needed in under a week — refer out');
   const needs=checks('epNeed');
-  paths.push(needs.length ? ('Estate planning ('+needs.join(', ')+') — books a planning session') : 'Estate planning inquiry — books a planning session');
+  paths.push(needs.length ? ('Simple estate planning ('+needs.join(', ')+') — books a planning session') : 'Estate planning inquiry — books a planning session');
   if(val('epMinors')==='Yes') flags.push('Minor children — include guardianship planning (informational)');
   priorAttyFlag(flags);
 
-  // EP books most: blockers refer out; otherwise schedule (flags are informational, do not downgrade)
+  // EP books simple/uncontested matters; contested or emergency → refer out
   let outcome = blockers.length ? 'no' : 'go';
-  let priority = outcome==='go' ? 'Standard' : 'Standard';
 
   return {outcome,priority,route:routeFor(office),paths,flags,blockers,actions,warnings,unclearStop:false,office};
 }
@@ -845,7 +845,8 @@ function buildNoteEstate(r){
   if(val('epAssets')) L.push(`Approx. estate/assets: ${val('epAssets')}`);
   L.push(`Owns real property? ${val('epRealProp')}`);
   L.push(`Minor children? ${val('epMinors')}`);
-  if(checks('epReferOut').length) L.push(`Refer-out flags (DRAFT): ${checks('epReferOut').join(', ')}`);
+  if(val('epContested')==='Yes') L.push('Contested / disputed: YES — refer out');
+  if(val('epEmergency')==='Yes') L.push('Emergency (needed < 1 week): YES — refer out');
   noteFoot(L);
   return L.join('\n');
 }
@@ -862,7 +863,7 @@ function collectState(){
   const s={};
   document.querySelectorAll('input[id],select[id],textarea[id]').forEach(el=>{ s[el.id]= el.type==='checkbox'?el.checked:el.value; });
   s.__practice=radio('practice'); s.__office=radio('office');
-  s.__matters=matters(); s.__bkDebtType=checks('bkDebtType'); s.__epNeed=checks('epNeed'); s.__epReferOut=checks('epReferOut');
+  s.__matters=matters(); s.__bkDebtType=checks('bkDebtType'); s.__epNeed=checks('epNeed');
   s.__people=peopleData();
   return s;
 }
@@ -880,7 +881,7 @@ function applyState(s){
   Object.keys(s).forEach(k=>{ if(k.startsWith('__'))return; const el=$(k); if(!el)return; if(el.type==='checkbox')el.checked=!!s[k]; else el.value=s[k]; });
   const setRadio=(nm,v)=>{ if(v){ const o=document.querySelector('input[name="'+nm+'"][value="'+v+'"]'); if(o)o.checked=true; } };
   setRadio('practice',s.__practice); setRadio('office',s.__office);
-  [['matter','__matters'],['bkDebtType','__bkDebtType'],['epNeed','__epNeed'],['epReferOut','__epReferOut']].forEach(([nm,key])=>{
+  [['matter','__matters'],['bkDebtType','__bkDebtType'],['epNeed','__epNeed']].forEach(([nm,key])=>{
     document.querySelectorAll('input[name="'+nm+'"]').forEach(c=>{ c.checked=(s[key]||[]).includes(c.value); });
   });
   syncAll();
