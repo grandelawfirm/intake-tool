@@ -195,6 +195,7 @@
           <input type="text" id="spouseLPRpath" placeholder="e.g., through a parent, prior marriage, asylum, employer…">
         </div>
       </div>
+      <div id="p245iRowWrap">
       <div class="row">
         <div><label>245(i) — PNC's own petition filed on/before 4/30/2001?</label>
           <select class="rp" id="p245i"><option>No</option><option>Unknown</option><option>Yes</option></select></div>
@@ -204,6 +205,7 @@
       <div id="p245iDateWrap" style="display:none">
         <label>If 245(i) may apply — when was that petition filed? <span class="hint">(must be on/before 4/30/2001)</span></label>
         <input type="text" id="p245iDate" placeholder="e.g., March 2001 (or exact date if known)">
+      </div>
       </div>
       <div class="row">
         <div><label>Spouse/adult child in U.S. military?</label>
@@ -560,8 +562,10 @@ function syncPractice(){
   $('mod-estate').style.display      = p==='estate' ? '' : 'none';
   const ab=$('addApplicantBtn'); if(ab) ab.style.display = p==='immigration' ? '' : 'none';
 }
+function show245i(){ const m=matters(); return (m.includes('familyBased')||m.includes('aos')) || !(m.includes('naturalization')||m.includes('i751')); }
 function syncCards(){
   const m = matters();
+  const r245=$('p245iRowWrap'); if(r245) r245.style.display = show245i() ? '' : 'none';
   $('natCard').style.display    = m.includes('naturalization') ? '' : 'none';
   $('i751Card').style.display   = m.includes('i751') ? '' : 'none';
   $('sijCard').style.display    = m.includes('humanitarian') ? '' : 'none';
@@ -582,7 +586,7 @@ function syncRelief(){
   t('vocReportedWrap', val('voc')!=='No');
   t('vawaDetailsWrap', val('vawa')==='Yes');
   t('asylumFieldsWrap', val('asylum')==='Yes');
-  t('p245iDateWrap', val('p245i')!=='No' || val('spouse245i')!=='No');
+  t('p245iDateWrap', show245i() && (val('p245i')!=='No' || val('spouse245i')!=='No'));
 }
 function syncBK(){
   const t=(id,cond)=>{ const e=$(id); if(e) e.style.display=cond?'':'none'; };
