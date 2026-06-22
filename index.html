@@ -261,6 +261,10 @@
         <div><label>Any trip outside U.S. &gt; 6 months?</label>
           <select class="rp" id="trips6"><option>No</option><option>Yes</option></select></div>
       </div>
+      <div class="row">
+        <div id="trips6DetailWrap" style="display:none"><label>If yes — how long, and where?</label><input type="text" id="trips6Detail" placeholder="e.g., 8 months in Mexico, 2022"></div>
+        <div><label>How many trips outside the U.S. in the last 5 years?</label><input type="text" id="tripsCount" placeholder="number of trips"></div>
+      </div>
       <div class="row3">
         <div><label>Taxes filed every year?</label><select class="rp" id="taxes"><option>Yes</option><option>No</option></select></div>
         <div><label>Any arrests?</label><select class="rp" id="arrests"><option>No</option><option>Yes</option></select></div>
@@ -587,6 +591,7 @@ function syncRelief(){
   t('vawaDetailsWrap', val('vawa')==='Yes');
   t('asylumFieldsWrap', val('asylum')==='Yes');
   t('p245iDateWrap', show245i() && (val('p245i')!=='No' || val('spouse245i')!=='No'));
+  t('trips6DetailWrap', val('trips6')==='Yes');
 }
 function syncBK(){
   const t=(id,cond)=>{ const e=$(id); if(e) e.style.display=cond?'':'none'; };
@@ -904,7 +909,7 @@ function buildNoteImmigration(r){
   rp('245(i) derivative (spouse/parent)','spouse245i');
   if(val('p245iDate') && (val('p245i')!=='No'||val('spouse245i')!=='No')) L.push(`245(i) petition filed: ${val('p245iDate')}`);
   if(val('asylum')==='Yes') L.push(`Asylum: Yes · fear ${val('asylumFear')} · filed ${val('asylumFiled')} · >1yr-late ${val('asylumLate')} · exception ${val('asylumException')}`);
-  if(r.m.includes('naturalization')) L.push(`N-400: LPR ${val('lprTime')} · trip>6mo ${val('trips6')} · taxes ${val('taxes')} · arrests ${val('arrests')} · claimed USC/voted ${val('falseUSC')}`);
+  if(r.m.includes('naturalization')) L.push(`N-400: LPR ${val('lprTime')} · trip>6mo ${val('trips6')}${val('trips6')==='Yes'&&val('trips6Detail')?' ('+val('trips6Detail')+')':''} · #trips last 5 yrs ${val('tripsCount')||'?'} · taxes ${val('taxes')} · arrests ${val('arrests')} · claimed USC/voted ${val('falseUSC')}`);
   if(r.m.includes('i751')) L.push(`I-751: conditional GC ${val('condGC')} · still married ${val('stillMarried')} · expiring ${val('expiring')}`);
   if(r.m.includes('humanitarian') && val('sijAge')!=='Unknown') L.push(`SIJ: under 21 ${val('sijAge')} · unmarried ${val('sijUnmarried')} · juvenile court order ${val('sijOrder')}`);
   if(r.m.includes('court')) L.push(`Court venue out-of-state? ${val('outOfStateVenue')}`);
