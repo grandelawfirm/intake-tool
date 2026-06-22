@@ -82,7 +82,6 @@
   <!-- LEFT: FORM -->
   <main>
     <div class="toolbar">
-      <button class="btn btn-ghost btn-sm" id="addApplicantBtn" onclick="addPerson()">+ Add another applicant</button>
       <button class="btn btn-ghost btn-sm" onclick="resetAll()">↺ Reset / clear</button>
     </div>
 
@@ -171,6 +170,7 @@
       <h2>Who needs the immigration help? <span class="hint">(the person who wants to apply)</span></h2>
       <div class="small" style="margin:-4px 0 10px">Fill this out for the person who wants help with their case. If two people both want help — like a husband and wife — add a block for each one.</div>
       <div id="people"></div>
+      <button class="btn btn-ghost btn-sm" onclick="addPerson()" style="margin-top:6px">+ Add another applicant</button>
     </div>
 
     <div class="card">
