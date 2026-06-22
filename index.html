@@ -112,7 +112,9 @@
           <select id="language"><option>English</option><option>Spanish</option></select>
         </div>
       </div>
-      <div class="row">
+      <div class="row3">
+        <div><label>Intake by <span class="hint">(initials)</span></label>
+          <select id="intakeBy"><option>—</option><option>WM</option><option>MM</option><option>JP</option><option>Other</option></select></div>
         <div><label>Credit offered? <span class="hint">(fee waived)</span></label>
           <select id="credit"><option>No</option><option>Yes</option></select></div>
         <div><label>Source</label><input type="text" id="source" placeholder="Referral / how they heard about us"></div>
@@ -511,6 +513,8 @@ function addPerson(){
         <div><label>How long were they held?</label><select class="p-held"><option value="">—</option><option>A few hours</option><option>Overnight to a few days</option><option>Weeks or more</option><option>Unsure</option></select></div>
         <div><label>Did they present FALSE documents? <span class="hint">(someone else's papers)</span></label><select class="p-false"><option>No</option><option>Yes</option></select></div>
       </div>
+      <label>Have they requested a FOIA already? <span class="hint">(to confirm the immigration record)</span></label>
+      <select class="p-stopFoia"><option>No</option><option>Yes</option></select>
       <div class="depverdict small"></div>
     </div>
     <label>A-number <span class="hint">(if in court / prior case)</span></label><input type="text" class="p-anum">
@@ -548,7 +552,7 @@ function peopleData(){
     overstay:p.querySelector('.p-overstay').value,
     multi:p.querySelector('.p-multi').value,
     history:p.querySelector('.p-history').value.trim(),
-    stopped:p.querySelector('.p-stopped').value, judge:p.querySelector('.p-judge').value, bar:p.querySelector('.p-bar').value, held:p.querySelector('.p-held').value, false:p.querySelector('.p-false').value,
+    stopped:p.querySelector('.p-stopped').value, judge:p.querySelector('.p-judge').value, bar:p.querySelector('.p-bar').value, held:p.querySelector('.p-held').value, false:p.querySelector('.p-false').value, stopFoia:p.querySelector('.p-stopFoia').value,
     anum:p.querySelector('.p-anum').value.trim(),
     hearing:p.querySelector('.p-hearing').value.trim(), masters:p.querySelector('.p-masters').value.trim(),
     marital:p.querySelector('.p-marital').value.trim(), spouse:p.querySelector('.p-spouse').value.trim(),
@@ -838,6 +842,7 @@ function noteHead(r, practiceLabel){
   L.push('');
   L.push('Intake Notes:');
   L.push(`${r.office} PNC · ${practiceLabel}`);
+  L.push(`Intake by: ${val('intakeBy')||'—'}`);
   L.push(`Credit Offered? ${val('credit')}`);
   L.push('');
   const titles={go:'✅ SCHEDULE',maybe:'🟡 MAY BOOK — attorney review',no:'❌ REFER OUT'};
@@ -882,7 +887,7 @@ function buildNoteImmigration(r){
     if(p.multi==='Yes') L.push(`Entered more than once — history: ${p.history||'(get details)'}`);
     if(p.stopped && p.stopped!=='No'){
       const cls=(p.judge==='Yes'||p.bar==='Yes'||p.held==='Weeks or more')?'likely REMOVAL/deportation order (serious)':(p.false==='Yes'?'FALSE docs — needs FOIA (not a simple return)':'likely a "return" (not a removal)');
-      L.push(`Immigration stop: ${p.stopped} — ${cls}${p.judge==='Yes'?' · saw judge/order':''}${p.bar==='Yes'?' · entry-bar paper':''}${p.held&&p.held!=='Unsure'?' · held: '+p.held:''}${p.false==='Yes'?' · FALSE DOCS: YES':''}`);
+      L.push(`Immigration stop: ${p.stopped} — ${cls}${p.judge==='Yes'?' · saw judge/order':''}${p.bar==='Yes'?' · entry-bar paper':''}${p.held&&p.held!=='Unsure'?' · held: '+p.held:''}${p.false==='Yes'?' · FALSE DOCS: YES':''}${p.stopFoia==='Yes'?' · FOIA already requested':''}`);
     }
     if(p.anum) L.push(`A-number: ${p.anum}`);
     if(p.hearing||p.masters) L.push(`Hearing info: ${p.hearing}${p.masters?' · # masters: '+p.masters:''}`);
@@ -976,7 +981,7 @@ function applyState(s){
     const set=(c,v)=>{ const e=p.querySelector(c); if(e&&v!=null) e.value=v; };
     set('.p-name',pd.name);set('.p-cob',pd.cob);set('.p-entry',pd.entry);set('.p-dates',pd.dates);
     set('.p-overstay',pd.overstay);set('.p-multi',pd.multi);set('.p-history',pd.history);
-    set('.p-stopped',pd.stopped);set('.p-judge',pd.judge);set('.p-bar',pd.bar);set('.p-held',pd.held);set('.p-false',pd.false);
+    set('.p-stopped',pd.stopped);set('.p-judge',pd.judge);set('.p-bar',pd.bar);set('.p-held',pd.held);set('.p-false',pd.false);set('.p-stopFoia',pd.stopFoia);
     set('.p-anum',pd.anum);set('.p-hearing',pd.hearing);set('.p-masters',pd.masters);
     set('.p-marital',pd.marital);set('.p-spouse',pd.spouse);set('.p-petitions',pd.petitions);set('.p-kids',pd.kids);
     set('.p-arrest',pd.arrest);set('.p-arrestDetail',pd.arrestDetail);set('.p-arrestDocs',pd.arrestDocs);set('.p-foiaDone',pd.foiaDone);set('.p-fbiPulled',pd.fbiPulled);
