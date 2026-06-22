@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Immigration PNC Qualifier — The Grande Law Firm</title>
+<title>PNC Qualifier — The Grande Law Firm</title>
 <style>
   :root{
     --green:#1a7f37; --green-bg:#e9f7ef;
@@ -37,6 +37,7 @@
       padding:6px 10px;border-radius:8px;cursor:pointer;background:#fff;font-size:13px}
   .seg input{margin:0}
   .seg label:has(input:checked){border-color:var(--accent);background:#eef2ff}
+  .pickbig label{padding:9px 14px;font-weight:600;font-size:14px}
   .person{border:1px dashed var(--line);border-radius:10px;padding:12px;margin-bottom:12px;background:#fbfcfe}
   .person h3{margin:0 0 8px;font-size:13px;color:var(--accent)}
   .btn{appearance:none;border:0;border-radius:9px;padding:10px 16px;font:inherit;font-weight:600;cursor:pointer}
@@ -44,7 +45,6 @@
   .btn-ghost{background:#eef1f6;color:var(--ink)}
   .btn-sm{padding:6px 10px;font-size:12px}
   .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-  /* results */
   aside{position:sticky;top:14px;align-self:start}
   .verdict{border-radius:12px;padding:16px;margin-bottom:14px;border:2px solid var(--line)}
   .verdict.empty{background:#fff;color:var(--muted)}
@@ -73,7 +73,7 @@
 </head>
 <body>
 <header>
-  <h1>Immigration PNC Qualifier <span class="tag">v1 · internal use only</span></h1>
+  <h1>PNC Strategy-Session Qualifier <span class="tag">internal use only</span></h1>
   <span class="tag">The Grande Law Firm</span>
 </header>
 <div class="privacy">🔒 Private by design — your entries are never uploaded. A draft is saved only on this computer so you don't lose work mid-call, and it clears when you reset. Works fully offline.</div>
@@ -82,15 +82,24 @@
   <!-- LEFT: FORM -->
   <main>
     <div class="toolbar">
-      <button class="btn btn-ghost btn-sm" onclick="addPerson()">+ Add another applicant</button>
+      <button class="btn btn-ghost btn-sm" id="addApplicantBtn" onclick="addPerson()">+ Add another applicant</button>
       <button class="btn btn-ghost btn-sm" onclick="resetAll()">↺ Reset / clear</button>
+    </div>
+
+    <div class="card">
+      <h2>Practice area</h2>
+      <div class="seg pickbig" data-name="practice">
+        <label><input type="radio" name="practice" value="immigration" checked>Immigration</label>
+        <label><input type="radio" name="practice" value="bankruptcy">Bankruptcy</label>
+        <label><input type="radio" name="practice" value="estate">Estate Planning</label>
+      </div>
     </div>
 
     <div class="card">
       <h2>Call basics</h2>
       <div class="row3">
         <div><label>Office</label>
-          <div class="seg" data-name="office" data-renamed="main-norcal">
+          <div class="seg" data-name="office">
             <label><input type="radio" name="office" value="Main" checked>Main</label>
             <label><input type="radio" name="office" value="NorCal">NorCal</label>
           </div>
@@ -126,6 +135,8 @@
       <label>Where do they live?</label><input type="text" id="location">
     </div>
 
+    <!-- ============ IMMIGRATION MODULE ============ -->
+    <div id="mod-immigration">
     <div class="card">
       <h2>What kind of help? <span class="hint">(check all that apply)</span></h2>
       <div class="seg" id="matterTypes">
@@ -259,6 +270,99 @@
       <select class="rp" id="indHearingSoon"><option>No / N/A</option><option>Yes</option></select>
       <div class="small">Capture exact hearing dates & # of master hearings in the person block above.</div>
     </div>
+    </div><!-- /mod-immigration -->
+
+    <!-- ============ BANKRUPTCY MODULE ============ -->
+    <div id="mod-bankruptcy" style="display:none">
+      <div class="card">
+        <h2>Bankruptcy — housing & income</h2>
+        <div class="row">
+          <div><label>Own a home or rent?</label><select id="bkHousing"><option>—</option><option>Rent</option><option>Own</option><option>Other</option></select></div>
+          <div><label>Monthly rent / mortgage</label><input type="text" id="bkHousingAmt" placeholder="$ / month"></div>
+        </div>
+        <div class="row">
+          <div><label>Owned a home in the past?</label><select id="bkPastHome"><option>No</option><option>Yes</option></select></div>
+          <div><label>Foreclosure sale date? <span class="hint">(if any — urgent)</span></label><input type="text" id="bkForeclosure" placeholder="date — or 'none'"></div>
+        </div>
+        <div id="bkHomeWrap" style="display:none">
+          <div class="row">
+            <div><label>Home purchase price <span class="hint">(NorCal homeowner)</span></label><input type="text" id="bkHomePrice"></div>
+            <div><label>Property address</label><input type="text" id="bkHomeAddr"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div><label>Currently working?</label><select id="bkWorking"><option>No</option><option>Yes</option></select></div>
+          <div><label>Monthly income (PNC)</label><input type="text" id="bkIncome" placeholder="$ / month"></div>
+        </div>
+        <div class="row" id="bkWorkWrap" style="display:none">
+          <div><label>Full or part time?</label><select id="bkFT"><option>Full-time</option><option>Part-time</option></select></div>
+          <div><label>What kind of work?</label><input type="text" id="bkJob"></div>
+        </div>
+        <label>Any other income besides their job? <span class="hint">(SSI, child support, etc.)</span></label><input type="text" id="bkOtherIncome" placeholder="or 'none'">
+        <div class="row">
+          <div><label>Marital status</label><select id="bkMarital"><option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option><option>Separated</option></select></div>
+          <div><label>Total household income</label><input type="text" id="bkHousehold" placeholder="$ / month"></div>
+        </div>
+        <div id="bkSpouseWrap" style="display:none">
+          <div class="row">
+            <div><label>Is the spouse working?</label><select id="bkSpouseWorking"><option>No</option><option>Yes</option></select></div>
+            <div><label>Spouse monthly income</label><input type="text" id="bkSpouseIncome" placeholder="$ / month"></div>
+          </div>
+        </div>
+        <label>Any kids? Ages?</label><input type="text" id="bkKids" placeholder="e.g., 2 — ages 13 & 11">
+      </div>
+
+      <div class="card">
+        <h2>Bankruptcy — debts</h2>
+        <div class="row">
+          <div><label>Total debt amount</label><input type="text" id="bkDebtAmt" placeholder="$ estimate (e.g., 20000)"></div>
+          <div><label>Any lawsuits, or wage / bank garnishments? <span class="hint">(urgent — schedule ASAP)</span></label><select id="bkGarnish"><option>No</option><option>Yes</option></select></div>
+        </div>
+        <label>What kinds of debt? <span class="hint">(check all — we don't take student-loan-only or recent-tax-only cases)</span></label>
+        <div class="seg" id="bkDebtTypes">
+          <label><input type="checkbox" name="bkDebtType" value="Credit cards">Credit cards</label>
+          <label><input type="checkbox" name="bkDebtType" value="Medical">Medical</label>
+          <label><input type="checkbox" name="bkDebtType" value="Personal loans">Personal loans</label>
+          <label><input type="checkbox" name="bkDebtType" value="Collections">Collections</label>
+          <label><input type="checkbox" name="bkDebtType" value="Car loans">Car loans</label>
+          <label><input type="checkbox" name="bkDebtType" value="Taxes">Taxes</label>
+          <label><input type="checkbox" name="bkDebtType" value="Student loans">Student loans</label>
+        </div>
+        <label>Vehicles <span class="hint">(make, model, year, balance owed, repossessed before?)</span></label><input type="text" id="bkVehicles" placeholder="e.g., 2018 Honda Civic, ~$9k owed, no repo">
+        <div class="row">
+          <div><label>Filed bankruptcy before?</label><select id="bkPrior"><option>No</option><option>Yes</option></select></div>
+          <div><label>Annual income reported on taxes <span class="hint">(for ARAG)</span></label><input type="text" id="bkAnnualIncome" placeholder="$ / year (or NA)"></div>
+        </div>
+        <div id="bkPriorWrap" style="display:none"><label>When did they file, and under which chapter?</label><input type="text" id="bkPriorDetail" placeholder="e.g., Chapter 7 in 2016"></div>
+      </div>
+    </div><!-- /mod-bankruptcy -->
+
+    <!-- ============ ESTATE PLANNING MODULE ============ -->
+    <div id="mod-estate" style="display:none">
+      <div class="card">
+        <h2>Estate planning — what they need</h2>
+        <div class="seg" id="epNeeds">
+          <label><input type="checkbox" name="epNeed" value="Will">Will</label>
+          <label><input type="checkbox" name="epNeed" value="Trust">Trust</label>
+          <label><input type="checkbox" name="epNeed" value="POA / healthcare directive">POA / healthcare directive</label>
+          <label><input type="checkbox" name="epNeed" value="Guardianship for minor children">Guardianship (minor kids)</label>
+          <label><input type="checkbox" name="epNeed" value="Probate (someone passed away)">Probate</label>
+          <label><input type="checkbox" name="epNeed" value="Other">Other</label>
+        </div>
+        <div class="row">
+          <div><label>Approx. estate value / assets</label><input type="text" id="epAssets" placeholder="e.g., home + savings ~$400k"></div>
+          <div><label>Own real property?</label><select id="epRealProp"><option>No</option><option>Yes</option><option>Unknown</option></select></div>
+        </div>
+        <label>Minor children (may need guardianship)?</label><select id="epMinors"><option>No</option><option>Yes</option></select>
+        <label style="margin-top:14px">Refer-out / escalate situations <span class="hint">(DRAFT — confirm with CG)</span></label>
+        <div class="seg" id="epReferOuts">
+          <label><input type="checkbox" name="epReferOut" value="Active probate litigation / will contest">Active probate litigation / will contest</label>
+          <label><input type="checkbox" name="epReferOut" value="Very high net worth / complex tax planning">Very high net worth / complex tax planning</label>
+          <label><input type="checkbox" name="epReferOut" value="Business succession / complex entities">Business succession / complex entities</label>
+        </div>
+        <div class="small">Estate planning books most inquiries. The boxes above are <b>placeholder</b> refer-outs — tell CG which situations should actually refer out and they'll be locked in.</div>
+      </div>
+    </div><!-- /mod-estate -->
 
     <div class="card">
       <h2>Compliance & wrap-up</h2>
@@ -284,7 +388,7 @@
   <aside>
     <div id="verdict" class="verdict empty">
       <div class="big">Awaiting input</div>
-      <div>Fill the form and press <b>Get recommendation</b>.</div>
+      <div>Pick a practice area, fill the form, and the recommendation appears here.</div>
     </div>
 
     <div class="card notebox">
@@ -303,9 +407,11 @@ const $ = id => document.getElementById(id);
 const val = id => ($(id)?.value || '').trim();
 const radio = name => (document.querySelector(`input[name="${name}"]:checked`)||{}).value || '';
 const matters = () => [...document.querySelectorAll('input[name="matter"]:checked')].map(c=>c.value);
+const checks = name => [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(c=>c.value);
+const practice = () => radio('practice') || 'immigration';
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-/* ---------- dynamic people ---------- */
+/* ---------- dynamic people (immigration) ---------- */
 let pCount = 0;
 function addPerson(){
   pCount++;
@@ -381,7 +487,14 @@ function peopleData(){
   }));
 }
 
-/* ---------- show/hide cards by matter type ---------- */
+/* ---------- show/hide ---------- */
+function syncPractice(){
+  const p=practice();
+  $('mod-immigration').style.display = p==='immigration' ? '' : 'none';
+  $('mod-bankruptcy').style.display  = p==='bankruptcy' ? '' : 'none';
+  $('mod-estate').style.display      = p==='estate' ? '' : 'none';
+  const ab=$('addApplicantBtn'); if(ab) ab.style.display = p==='immigration' ? '' : 'none';
+}
 function syncCards(){
   const m = matters();
   $('natCard').style.display    = m.includes('naturalization') ? '' : 'none';
@@ -402,6 +515,13 @@ function syncRelief(){
   t('vawaDetailsWrap', val('vawa')==='Yes');
   t('asylumFieldsWrap', val('asylum')==='Yes');
   t('p245iDateWrap', val('p245i')!=='No' || val('spouse245i')!=='No');
+}
+function syncBK(){
+  const t=(id,cond)=>{ const e=$(id); if(e) e.style.display=cond?'':'none'; };
+  t('bkWorkWrap', val('bkWorking')==='Yes');
+  t('bkSpouseWrap', val('bkMarital')==='Married');
+  t('bkPriorWrap', val('bkPrior')==='Yes');
+  t('bkHomeWrap', radio('office')==='NorCal' && val('bkHousing')==='Own');
 }
 function syncPerson(p){
   const show=(c,cond)=>{ const e=p.querySelector(c); if(e) e.style.display=cond?'':'none'; };
@@ -429,28 +549,29 @@ function syncPerson(p){
   }
 }
 function syncCaller(){ $('onBehalfWrap').style.display = (val('callerRel')!=='Self (calling for themselves)') ? '' : 'none'; }
-function syncAll(){ syncCards(); syncCaller(); syncSpouse(); syncRelief(); document.querySelectorAll('.person').forEach(syncPerson); }
+function syncAll(){ syncPractice(); syncCards(); syncCaller(); syncSpouse(); syncRelief(); syncBK(); document.querySelectorAll('.person').forEach(syncPerson); }
 document.addEventListener('change', syncAll);
-function liveRun(){ if(matters().length) run(); }
+function liveRun(){ if(practice()!=='immigration' || matters().length) run(); }
 document.addEventListener('change', liveRun);
 document.addEventListener('input', liveRun);
 
-/* ---------- decision engine ---------- */
-function evaluate(){
+/* ---------- shared helpers ---------- */
+function priorAttyFlag(flags){ const pa=val('priorAtty'); if(pa && !/^none$|^n\/?a$|^no$/i.test(pa)) flags.push('Prior/current attorney ("'+pa+'") — verify representation status before proceeding'); }
+function routeFor(office){ return office==='NorCal' ? 'Valencia (VH)' : 'Cynthia (CG)'; }
+
+/* ================= IMMIGRATION ENGINE ================= */
+function evaluateImmigration(){
   const m = matters();
   const ppl = peopleData();
   const paths=[], flags=[], blockers=[], actions=[], warnings=[];
-  const yes = v => v==='Yes';
   if(!val('source')) warnings.push('Source is blank — capture how they heard about us');
   if(ppl.some(p=>p.entry==='With visa / inspected' && p.overstay==='Unknown')) warnings.push('Visa overstay is Unknown — confirm whether they overstayed');
 
-  // hard blockers
   if($('wrongArea').checked) blockers.push('Matter is outside the firm’s practice areas');
   if(val('conflict')==='Yes') blockers.push('Definite conflict of interest');
   if(m.includes('court') && val('indHearingSoon')==='Yes')
     blockers.push('Individual hearing is under 1 month away — too late to prepare');
 
-  // entry analysis across people
   const trueEWI = ppl.filter(p=>p.entry.startsWith('TRUE EWI'));
   const multiEWI = trueEWI.some(p=>p.multi==='Yes');
   const falseDocs = ppl.some(p=>p.false==='Yes');
@@ -459,7 +580,6 @@ function evaluate(){
   const paroleEntry = ppl.some(p=>(p.entry||'').startsWith('Parole'));
   if(paroleEntry) paths.push('Parole entry (advance parole / CBP One / humanitarian) — inspected/admitted; may allow adjustment of status — worth a session');
 
-  // qualifying relief paths
   const spouseQ = val('marriedTo').startsWith('Yes');
   const parentQ = val('parentsUSCLPR').startsWith('Yes');
   if(m.includes('familyBased') && (spouseQ || parentQ)){
@@ -481,7 +601,6 @@ function evaluate(){
   }
   if(val('inRemoval')==='Yes'){ paths.push('In removal proceedings — relief may be available in court'); flags.push('In court — capture A-number & hearing dates'); }
 
-  // N-400
   if(m.includes('naturalization')){
     const t = val('lprTime');
     const eligible = t==='5+ years' || t==='3+ years (married to USC)';
@@ -495,13 +614,11 @@ function evaluate(){
     else if(t==='Not yet eligible') flags.push('N-400 — not yet eligible by time; confirm path');
   }
 
-  // I-751
   if(m.includes('i751')){
     if(val('condGC')==='Yes' && val('stillMarried')==='Yes') paths.push('I-751 — standard joint filing');
     else if(val('condGC')==='Yes' && val('stillMarried')==='No') flags.push('I-751 — no longer married → waiver analysis');
   }
 
-  // SIJ (humanitarian)
   if(m.includes('humanitarian')){
     if(val('sijAge')==='Yes' && val('sijUnmarried')==='Yes' && (val('sijOrder')==='Yes — has order' || val('sijOrder')==='Not yet — may qualify'))
       paths.push('SIJ — under 21, unmarried, juvenile court order (abuse/abandonment/neglect)');
@@ -509,48 +626,91 @@ function evaluate(){
       flags.push('Possible SIJ — under 21; confirm juvenile court order (abuse/abandonment/neglect)');
   }
 
-  // Asylum
   if(val('asylum')==='Yes'){
     if(val('asylumFear')==='Yes'){ paths.push('Asylum — fear-based claim'); flags.push('Asylum strength needs attorney evaluation'); }
     else if(val('asylumFear')==='No') flags.push('Asylum appears economic-only — likely not a qualifying basis');
     if(val('asylumFiled')==='No') actions.push('Asylum NOT filed → email CG for assessment');
   }
 
-  // EWI complications
-  if(multiEWI){
-    flags.push('Multiple TRUE EWI entries — permanent-bar timing analysis needed (capture entry dates & detention)');
-  }
-  if(falseDocs){
-    actions.push('Flag for attorney: FALSE documents in history — do NOT treat as a simple return; FOIA likely needed (possible expedited removal / fraud). They can still book.');
-  }
+  if(multiEWI) flags.push('Multiple TRUE EWI entries — permanent-bar timing analysis needed (capture entry dates & detention)');
+  if(falseDocs) actions.push('Flag for attorney: FALSE documents in history — do NOT treat as a simple return; FOIA likely needed (possible expedited removal / fraud). They can still book.');
   if(priorRemoval) flags.push('Prior removal order / 5-year-bar — bar & waiver analysis');
   else if(unclearStop) actions.push('Removal history unclear — they can still book; do NOT promise an outcome (use the non-promissory wording). Confirm later via A-number / FOIA.');
 
-  // court (Main bookable per rule; NorCal asylum/removal → VH)
   if(m.includes('court')) flags.push('Court/removal case — confirm timeline & capacity');
+  priorAttyFlag(flags);
 
-  // prior attorney (flag, never blocks)
-  const pa = val('priorAtty');
-  if(pa && !/^none$|^n\/?a$|^no$/i.test(pa)) flags.push('Prior/current attorney ("'+pa+'") — verify representation status before proceeding');
-
-  // ---- outcome ----
   let outcome, priority='Standard';
   if(blockers.length){ outcome='no'; }
   else if(paths.length){ outcome = flags.length ? 'maybe' : 'go'; priority = (outcome==='go') ? 'High' : 'Standard'; }
-  else { outcome='maybe'; } // no clear path, no hard blocker → may book, non-promissory
+  else { outcome='maybe'; }
+  if(outcome!=='no' && (paths.some(p=>/Family-based|245\(i\)|N-400 — meets|I-751 — standard/.test(p)))) priority='High';
 
-  // strong-case priority bump
-  if(outcome!=='no' && (paths.some(p=>/Family-based|245\(i\)|N-400 — meets|I-751 — standard|Derivative via spouse/.test(p)))) priority='High';
-
-  // routing
   const office = radio('office');
-  let route = office==='NorCal' ? 'Valencia (VH)' : 'Cynthia (CG)';
+  let route = routeFor(office);
   if(office==='NorCal' && (val('asylum')==='Yes' || m.includes('court'))) route='Valencia (VH) — NorCal asylum/removal';
 
   return {outcome,priority,route,paths,flags,blockers,actions,warnings,unclearStop,m,ppl,office};
 }
 
-/* ---------- render verdict ---------- */
+/* ================= BANKRUPTCY ENGINE ================= */
+function evaluateBankruptcy(){
+  const paths=[], flags=[], blockers=[], actions=[], warnings=[];
+  const office=radio('office');
+  if(!val('source')) warnings.push('Source is blank — capture how they heard about us');
+  if(val('conflict')==='Yes') blockers.push('Definite conflict of interest');
+
+  const types=checks('bkDebtType');
+  const debt=parseFloat((val('bkDebtAmt')||'').replace(/[^0-9.]/g,''))||0;
+  const fc=val('bkForeclosure');
+  const urgent = val('bkGarnish')==='Yes' || (fc && !/^no(ne)?$|^n\/?a$/i.test(fc));
+  const onlyStudent = types.length===1 && types[0]==='Student loans';
+  const onlyTax = types.length===1 && types[0]==='Taxes';
+
+  if(onlyStudent) blockers.push('Only student-loan debt — the firm does not take these');
+  else if(onlyTax) blockers.push('Only tax debt — not a fit for bankruptcy');
+  else if(debt>0 && debt<7000 && !urgent) blockers.push('Total debt under $7K — below the threshold to schedule');
+
+  if(urgent) paths.push('URGENT — lawsuit/garnishment or foreclosure date present: schedule ASAP');
+  if(debt>=7000 && !onlyStudent && !onlyTax) paths.push('Debt $'+debt.toLocaleString()+' (≥ $7K) with dischargeable debt — qualifies for a session');
+  if(!debt && !urgent && !blockers.length) warnings.push('Total debt amount is blank — confirm the estimate ($7K+ to schedule)');
+
+  if(office==='NorCal' && val('bkHousing')==='Own') flags.push('NorCal homeowner — if this becomes a Chapter 13, refer out; confirm with VH');
+  if(val('bkPrior')==='Yes') flags.push('Filed bankruptcy before — confirm timing before refiling (Ch.7 ~8 yrs; Ch.13 varies)');
+  priorAttyFlag(flags);
+
+  let outcome, priority='Standard';
+  if(blockers.length) outcome='no';
+  else if(urgent){ outcome = flags.length?'maybe':'go'; priority='High'; }
+  else if(paths.length){ outcome = flags.length?'maybe':'go'; priority = outcome==='go'?'High':'Standard'; }
+  else outcome='maybe';
+
+  return {outcome,priority,route:routeFor(office),paths,flags,blockers,actions,warnings,unclearStop:false,office};
+}
+
+/* ================= ESTATE PLANNING ENGINE ================= */
+function evaluateEstate(){
+  const paths=[], flags=[], blockers=[], actions=[], warnings=[];
+  const office=radio('office');
+  if(!val('source')) warnings.push('Source is blank — capture how they heard about us');
+  if(val('conflict')==='Yes') blockers.push('Definite conflict of interest');
+
+  checks('epReferOut').forEach(x=>blockers.push('Estate-planning refer-out (DRAFT, confirm w/ CG): '+x));
+  const needs=checks('epNeed');
+  paths.push(needs.length ? ('Estate planning ('+needs.join(', ')+') — books a planning session') : 'Estate planning inquiry — books a planning session');
+  if(val('epMinors')==='Yes') flags.push('Minor children — include guardianship planning (informational)');
+  priorAttyFlag(flags);
+
+  // EP books most: blockers refer out; otherwise schedule (flags are informational, do not downgrade)
+  let outcome = blockers.length ? 'no' : 'go';
+  let priority = outcome==='go' ? 'Standard' : 'Standard';
+
+  return {outcome,priority,route:routeFor(office),paths,flags,blockers,actions,warnings,unclearStop:false,office};
+}
+
+function evaluate(){ const p=practice(); return p==='bankruptcy'?evaluateBankruptcy() : p==='estate'?evaluateEstate() : evaluateImmigration(); }
+
+/* ---------- render verdict (shared) ---------- */
 function render(r){
   const v=$('verdict');
   const titles={go:'✅ SCHEDULE — clear fit',maybe:'🟡 MAY BOOK — attorney review',no:'❌ REFER OUT — not a fit'};
@@ -568,20 +728,20 @@ function render(r){
       ES: “La abogada puede revisar su situación y explicarle sus opciones.”</div>`;
   }
   if(r.outcome==='go'){
-    html+=`<div class="say" style="border-color:var(--green)"><b style="color:var(--green)">High-priority — offer the soonest slot.</b>
-      Book the 20-min strategy session with ${r.route}.</div>`;
+    html+=`<div class="say" style="border-color:var(--green)"><b style="color:var(--green)">Good to schedule${r.priority==='High'?' — offer the soonest slot':''}.</b>
+      Book the strategy session with ${esc(r.route)}.</div>`;
   }
   v.innerHTML=html;
 }
 
-/* ---------- build note ---------- */
-function buildNote(r){
+/* ---------- note builders ---------- */
+function noteHead(r, practiceLabel){
   const L=[];
   L.push(`${val('apptType')} Appointment`);
   L.push(`[Payment status line — added by intake/Mirna once paid]`);
   L.push('');
   L.push('Intake Notes:');
-  L.push(`${r.office} PNC`);
+  L.push(`${r.office} PNC · ${practiceLabel}`);
   L.push(`Credit Offered? ${val('credit')}`);
   L.push('');
   const titles={go:'✅ SCHEDULE',maybe:'🟡 MAY BOOK — attorney review',no:'❌ REFER OUT'};
@@ -597,10 +757,22 @@ function buildNote(r){
   L.push(`Caller: ${val('caller')}${_self?' — calling for themselves':' — calling as: '+val('callerRel')}`);
   L.push(`Where do they live? ${val('location')}`);
   L.push(`Source? ${val('source')}`);
-  if(!_self){
-    L.push(`Who needs help? ${val('whoNeeds')}`);
-    if(val('whoAppt')) L.push(`Who will attend the appointment? ${val('whoAppt')}`);
-  }
+  if(!_self){ L.push(`Who needs help? ${val('whoNeeds')}`); if(val('whoAppt')) L.push(`Who will attend the appointment? ${val('whoAppt')}`); }
+  L.push('');
+  return L;
+}
+function noteFoot(L){
+  L.push('');
+  L.push(`Prior attorneys? ${val('priorAtty')||'—'}`);
+  if(val('adverse')) L.push(`Conflict check — adverse party: ${val('adverse')}`);
+  L.push(`Pain point/goal? ${val('goal')}`);
+  L.push(`Best time to contact PNC? ${val('bestTime')}`);
+  L.push(`ARAG Member ID number? ${val('aragId')||'NA'}`);
+  L.push(`ARAG Case Assist number? ${val('aragCase')||'NA'}`);
+}
+
+function buildNoteImmigration(r){
+  const L=noteHead(r,'Immigration');
   const mt = r.m.map(x=>({familyBased:'Legalize status (family-based)',humanitarian:'Humanitarian (U-visa/VAWA/SIJ/asylum/TPS)',naturalization:'Citizenship (N-400)',i751:'Remove conditions (I-751)',court:'Court/removal',other:'Other: '+val('otherDesc')}[x])).join(', ');
   L.push(`Type of help: ${mt}`);
   L.push('');
@@ -611,7 +783,7 @@ function buildNote(r){
     if(p.entry==='With visa / inspected') L.push(`Visa overstay? ${p.overstay}`);
     if(p.multi==='Yes') L.push(`Entered more than once — history: ${p.history||'(get details)'}`);
     if(p.stopped && p.stopped!=='No'){
-      const cls=(p.judge==='Yes'||p.bar==='Yes'||p.held==='Weeks or more')?'likely REMOVAL/deportation order (serious)':'likely a "return" (not a removal)';
+      const cls=(p.judge==='Yes'||p.bar==='Yes'||p.held==='Weeks or more')?'likely REMOVAL/deportation order (serious)':(p.false==='Yes'?'FALSE docs — needs FOIA (not a simple return)':'likely a "return" (not a removal)');
       L.push(`Immigration stop: ${p.stopped} — ${cls}${p.judge==='Yes'?' · saw judge/order':''}${p.bar==='Yes'?' · entry-bar paper':''}${p.held&&p.held!=='Unsure'?' · held: '+p.held:''}${p.false==='Yes'?' · FALSE DOCS: YES':''}`);
     }
     if(p.anum) L.push(`A-number: ${p.anum}`);
@@ -631,7 +803,7 @@ function buildNote(r){
     L.push(sp);
   }
   rp('USC/LPR parents','parentsUSCLPR');
-  rp('245(i)','p245i'); rp('Military family','military'); rp('DACA/TPS + advance parole','dacaAP');
+  rp('245(i) own petition','p245i'); rp('Military family','military'); rp('DACA/TPS + advance parole','dacaAP');
   rp('In removal proceedings','inRemoval'); rp('VAWA abuse','vawa');
   if(val('vawa')==='Yes') L.push(`VAWA abuse details: ${val('vawaDetails')||'—'}`);
   if(val('voc')!=='No') L.push(`VOC: ${val('voc')} · reported? ${val('vocReported')}${val('vocDetails')?' · '+val('vocDetails'):''}`);
@@ -641,26 +813,57 @@ function buildNote(r){
   if(r.m.includes('naturalization')) L.push(`N-400: LPR ${val('lprTime')} · trip>6mo ${val('trips6')} · taxes ${val('taxes')} · arrests ${val('arrests')} · claimed USC/voted ${val('falseUSC')}`);
   if(r.m.includes('i751')) L.push(`I-751: conditional GC ${val('condGC')} · still married ${val('stillMarried')} · expiring ${val('expiring')}`);
   if(r.m.includes('humanitarian') && val('sijAge')!=='Unknown') L.push(`SIJ: under 21 ${val('sijAge')} · unmarried ${val('sijUnmarried')} · juvenile court order ${val('sijOrder')}`);
-  L.push('');
-  L.push(`Prior attorneys? ${val('priorAtty')||'—'}`);
-  if(val('adverse')) L.push(`Conflict check — adverse party: ${val('adverse')}`);
-  L.push(`Pain point/goal? ${val('goal')}`);
-  L.push(`Best time to contact PNC? ${val('bestTime')}`);
-  L.push(`ARAG Member ID number? ${val('aragId')||'NA'}`);
-  L.push(`ARAG Case Assist number? ${val('aragCase')||'NA'}`);
+  noteFoot(L);
   return L.join('\n');
 }
 
+function buildNoteBankruptcy(r){
+  const L=noteHead(r,'Bankruptcy');
+  L.push(`Own/rent? ${val('bkHousing')}${val('bkHousingAmt')?' · '+val('bkHousingAmt')+'/mo':''}`);
+  L.push(`Owned a home in the past? ${val('bkPastHome')}`);
+  if(val('bkForeclosure')) L.push(`Foreclosure sale date? ${val('bkForeclosure')}`);
+  if(r.office==='NorCal' && val('bkHousing')==='Own'){ if(val('bkHomePrice'))L.push(`Home purchase price: ${val('bkHomePrice')}`); if(val('bkHomeAddr'))L.push(`Property address: ${val('bkHomeAddr')}`); }
+  L.push(`Working? ${val('bkWorking')}${(val('bkWorking')==='Yes'&&val('bkFT'))?' ('+val('bkFT')+')':''}${val('bkJob')?' — '+val('bkJob'):''}`);
+  if(val('bkIncome')) L.push(`Monthly income: ${val('bkIncome')}`);
+  if(val('bkOtherIncome')) L.push(`Other income: ${val('bkOtherIncome')}`);
+  L.push(`Marital status: ${val('bkMarital')}`);
+  if(val('bkMarital')==='Married') L.push(`Spouse working? ${val('bkSpouseWorking')}${val('bkSpouseIncome')?' · '+val('bkSpouseIncome'):''}`);
+  if(val('bkHousehold')) L.push(`Total household income: ${val('bkHousehold')}`);
+  if(val('bkKids')) L.push(`Kids/ages: ${val('bkKids')}`);
+  L.push(`Filed BK before? ${val('bkPrior')}${val('bkPriorDetail')?' — '+val('bkPriorDetail'):''}`);
+  if(val('bkVehicles')) L.push(`Vehicles: ${val('bkVehicles')}`);
+  L.push(`Total debt: ${val('bkDebtAmt')||'(blank)'} · types: ${checks('bkDebtType').join(', ')||'—'}`);
+  L.push(`Lawsuits / garnishments? ${val('bkGarnish')}`);
+  if(val('bkAnnualIncome')) L.push(`Annual income on taxes (ARAG): ${val('bkAnnualIncome')}`);
+  noteFoot(L);
+  return L.join('\n');
+}
+
+function buildNoteEstate(r){
+  const L=noteHead(r,'Estate Planning');
+  L.push(`Needs: ${checks('epNeed').join(', ')||'—'}`);
+  if(val('epAssets')) L.push(`Approx. estate/assets: ${val('epAssets')}`);
+  L.push(`Owns real property? ${val('epRealProp')}`);
+  L.push(`Minor children? ${val('epMinors')}`);
+  if(checks('epReferOut').length) L.push(`Refer-out flags (DRAFT): ${checks('epReferOut').join(', ')}`);
+  noteFoot(L);
+  return L.join('\n');
+}
+
+function buildNote(r){ const p=practice(); return p==='bankruptcy'?buildNoteBankruptcy(r) : p==='estate'?buildNoteEstate(r) : buildNoteImmigration(r); }
+
 function run(){ const r=evaluate(); render(r); $('note').value=buildNote(r); }
 function copyNote(b){ const t=$('note'); if(!t.value) return; navigator.clipboard.writeText(t.value).then(()=>{ const o=b.textContent; b.textContent='✓ Copied'; setTimeout(()=>b.textContent=o,1200); }); }
-function resetAll(){ if(!confirm('Clear everything and start a new PNC?')) return; document.querySelectorAll('input,select,textarea').forEach(el=>{ if(el.type==='checkbox'||el.type==='radio'){ el.checked = (el.value==='Main'); } else el.value=''; }); document.querySelectorAll('select').forEach(s=>s.selectedIndex=0); $('people').innerHTML=''; pCount=0; addPerson(); syncAll(); $('verdict').className='verdict empty'; $('verdict').innerHTML='<div class="big">Awaiting input</div><div>Fill the form and press <b>Get recommendation</b>.</div>'; $('note').value=''; clearDraft(); }
+function resetAll(){ if(!confirm('Clear everything and start a new PNC?')) return; document.querySelectorAll('input,select,textarea').forEach(el=>{ if(el.type==='checkbox') el.checked=false; else if(el.type==='radio'){ el.checked=(el.value==='Main'||el.value==='immigration'); } else el.value=''; }); document.querySelectorAll('select').forEach(s=>s.selectedIndex=0); $('people').innerHTML=''; pCount=0; addPerson(); syncAll(); $('verdict').className='verdict empty'; $('verdict').innerHTML='<div class="big">Awaiting input</div><div>Pick a practice area, fill the form, and the recommendation appears here.</div>'; $('note').value=''; clearDraft(); }
 
 /* ---------- draft auto-save (local only, never uploaded) ---------- */
-const DRAFT_KEY='gl_immig_draft_v1';
+const DRAFT_KEY='gl_pnc_draft_v1';
 function collectState(){
   const s={};
   document.querySelectorAll('input[id],select[id],textarea[id]').forEach(el=>{ s[el.id]= el.type==='checkbox'?el.checked:el.value; });
-  s.__matters=matters(); s.__office=radio('office'); s.__people=peopleData();
+  s.__practice=radio('practice'); s.__office=radio('office');
+  s.__matters=matters(); s.__bkDebtType=checks('bkDebtType'); s.__epNeed=checks('epNeed'); s.__epReferOut=checks('epReferOut');
+  s.__people=peopleData();
   return s;
 }
 function applyState(s){
@@ -675,8 +878,11 @@ function applyState(s){
   });
   if(!$('people').children.length) addPerson();
   Object.keys(s).forEach(k=>{ if(k.startsWith('__'))return; const el=$(k); if(!el)return; if(el.type==='checkbox')el.checked=!!s[k]; else el.value=s[k]; });
-  document.querySelectorAll('input[name="matter"]').forEach(c=>{ c.checked=(s.__matters||[]).includes(c.value); });
-  if(s.__office){ const o=document.querySelector('input[name="office"][value="'+s.__office+'"]'); if(o)o.checked=true; }
+  const setRadio=(nm,v)=>{ if(v){ const o=document.querySelector('input[name="'+nm+'"][value="'+v+'"]'); if(o)o.checked=true; } };
+  setRadio('practice',s.__practice); setRadio('office',s.__office);
+  [['matter','__matters'],['bkDebtType','__bkDebtType'],['epNeed','__epNeed'],['epReferOut','__epReferOut']].forEach(([nm,key])=>{
+    document.querySelectorAll('input[name="'+nm+'"]').forEach(c=>{ c.checked=(s[key]||[]).includes(c.value); });
+  });
   syncAll();
 }
 let _saveT;
