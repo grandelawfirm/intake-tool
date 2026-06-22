@@ -302,17 +302,6 @@
       <div class="small">If the spouse can't be located → divorce by publication (more complex, but doable).</div>
     </div>
 
-    <div class="card" id="prereqCard" style="display:none">
-      <h2>Prerequisites outstanding? <span class="hint">(complete before filing)</span></h2>
-      <div class="seg" id="prereqs">
-        <label><input type="checkbox" name="prereq" value="FOIA / FBI fingerprints">FOIA / FBI fingerprints</label>
-        <label><input type="checkbox" name="prereq" value="Expungement before I-601A (e.g., DUI)">Expungement before I-601A (e.g., DUI)</label>
-        <label><input type="checkbox" name="prereq" value="Corrected vital documents">Corrected vital documents</label>
-        <label><input type="checkbox" name="prereq" value="Prior-attorney file / FOIA">Prior-attorney file retrieval</label>
-      </div>
-      <div class="small">If any are open, the next step is to complete the prerequisite first, then proceed.</div>
-    </div>
-
     <div class="card" id="courtCard" style="display:none">
       <h2>Court / removal checks</h2>
       <label>Is the <b>individual hearing</b> less than 1 month away? <span class="hint">(if yes → too late)</span></label>
@@ -536,7 +525,11 @@ function addPerson(){
     <div class="pw-arrest" style="display:none"><label>If yes — when, where, why, and what happened?</label>
       <input type="text" class="p-arrestDetail" placeholder="e.g., 2019, Los Angeles, DUI — case dismissed">
       <label>Do they have any court records or documents?</label>
-      <select class="p-arrestDocs"><option>Unknown</option><option>Yes — has records/documents</option><option>No</option></select></div>`;
+      <select class="p-arrestDocs"><option>Unknown</option><option>Yes — has records/documents</option><option>No</option></select>
+      <label>Have they completed a FOIA or FBI fingerprint check yet?</label>
+      <select class="p-foiaDone"><option>No</option><option>Yes</option></select>
+      <label>Have they pulled their FBI fingerprint results or Live Scan for their personal records? <span class="hint">(in addition to what we have)</span></label>
+      <select class="p-fbiPulled"><option>No</option><option>Yes</option></select></div>`;
   $('people').appendChild(div);
   syncPerson(div);
 }
@@ -553,7 +546,8 @@ function peopleData(){
     hearing:p.querySelector('.p-hearing').value.trim(), masters:p.querySelector('.p-masters').value.trim(),
     marital:p.querySelector('.p-marital').value.trim(), spouse:p.querySelector('.p-spouse').value.trim(),
     petitions:p.querySelector('.p-petitions').value.trim(), kids:p.querySelector('.p-kids').value.trim(),
-    arrest:p.querySelector('.p-arrest').value, arrestDetail:p.querySelector('.p-arrestDetail').value.trim(), arrestDocs:p.querySelector('.p-arrestDocs').value
+    arrest:p.querySelector('.p-arrest').value, arrestDetail:p.querySelector('.p-arrestDetail').value.trim(), arrestDocs:p.querySelector('.p-arrestDocs').value,
+    foiaDone:p.querySelector('.p-foiaDone').value, fbiPulled:p.querySelector('.p-fbiPulled').value
   }));
 }
 
@@ -575,7 +569,6 @@ function syncCards(){
   $('otherWrap').style.display  = m.includes('other') ? '' : 'none';
   $('aosCard').style.display     = m.includes('aos') ? '' : 'none';
   $('divorceCard').style.display = m.includes('divorce') ? '' : 'none';
-  $('prereqCard').style.display  = m.length ? '' : 'none';
   const rrw=$('referReasonWrap'); if(rrw) rrw.style.display = $('wrongArea').checked ? '' : 'none';
 }
 function syncSpouse(){
@@ -704,7 +697,6 @@ function evaluateImmigration(){
   if(m.includes('foia')) paths.push('FOIA — investigate prior filing/denial (~6 months)');
   if(m.includes('mandamus')){ paths.push('Federal Mandamus — delayed case'); flags.push('Mandamus vs. refile — refiling is often faster; attorney confirms remedy'); }
   if(m.includes('divorce')){ paths.push('Divorce (immigration prerequisite)'); if(val('spouseLocation')==='No') flags.push('Spouse cannot be located → divorce by publication (more complex but doable)'); }
-  const pre=checks('prereq'); if(pre.length) flags.push('PROCEED AFTER PREREQUISITE — complete first: '+pre.join('; '));
 
   if(m.includes('humanitarian')){
     if(val('sijAge')==='Yes' && val('sijUnmarried')==='Yes' && (val('sijOrder')==='Yes — has order' || val('sijOrder')==='Not yet — may qualify'))
@@ -888,7 +880,7 @@ function buildNoteImmigration(r){
     if(p.spouse) L.push(`Spouse/partner: ${p.spouse}`);
     if(p.petitions) L.push(`Prior petitions filed? ${p.petitions}`);
     if(p.kids) L.push(`Children: ${p.kids}`);
-    if(p.arrest==='Yes') L.push(`Arrested: YES — ${p.arrestDetail||'(get when/where/why/outcome)'}${p.arrestDocs&&p.arrestDocs!=='Unknown'?' · court records/docs: '+p.arrestDocs:''}`);
+    if(p.arrest==='Yes') L.push(`Arrested: YES — ${p.arrestDetail||'(get when/where/why/outcome)'}${p.arrestDocs&&p.arrestDocs!=='Unknown'?' · court records/docs: '+p.arrestDocs:''} · FOIA/FBI check done? ${p.foiaDone} · pulled FBI/Live Scan (personal)? ${p.fbiPulled}`);
     L.push('');
   });
   L.push('— Relief / screening —');
@@ -913,7 +905,6 @@ function buildNoteImmigration(r){
   if(r.m.includes('court')) L.push(`Court venue out-of-state? ${val('outOfStateVenue')}`);
   if(r.m.includes('aos')) L.push(`AOS: old I-130 ${val('oldI130')} · prior AOS denied ${val('priorAOSDenied')}`);
   if(r.m.includes('divorce')) L.push(`Divorce prereq: know spouse location? ${val('spouseLocation')}`);
-  if(checks('prereq').length) L.push(`Prerequisites outstanding: ${checks('prereq').join(', ')}`);
   noteFoot(L);
   return L.join('\n');
 }
@@ -965,7 +956,7 @@ function collectState(){
   const s={};
   document.querySelectorAll('input[id],select[id],textarea[id]').forEach(el=>{ s[el.id]= el.type==='checkbox'?el.checked:el.value; });
   s.__practice=radio('practice'); s.__office=radio('office');
-  s.__matters=matters(); s.__prereq=checks('prereq'); s.__bkDebtType=checks('bkDebtType'); s.__epNeed=checks('epNeed');
+  s.__matters=matters(); s.__bkDebtType=checks('bkDebtType'); s.__epNeed=checks('epNeed');
   s.__people=peopleData();
   return s;
 }
@@ -978,13 +969,13 @@ function applyState(s){
     set('.p-stopped',pd.stopped);set('.p-judge',pd.judge);set('.p-bar',pd.bar);set('.p-held',pd.held);set('.p-false',pd.false);
     set('.p-anum',pd.anum);set('.p-hearing',pd.hearing);set('.p-masters',pd.masters);
     set('.p-marital',pd.marital);set('.p-spouse',pd.spouse);set('.p-petitions',pd.petitions);set('.p-kids',pd.kids);
-    set('.p-arrest',pd.arrest);set('.p-arrestDetail',pd.arrestDetail);set('.p-arrestDocs',pd.arrestDocs);
+    set('.p-arrest',pd.arrest);set('.p-arrestDetail',pd.arrestDetail);set('.p-arrestDocs',pd.arrestDocs);set('.p-foiaDone',pd.foiaDone);set('.p-fbiPulled',pd.fbiPulled);
   });
   if(!$('people').children.length) addPerson();
   Object.keys(s).forEach(k=>{ if(k.startsWith('__'))return; const el=$(k); if(!el)return; if(el.type==='checkbox')el.checked=!!s[k]; else el.value=s[k]; });
   const setRadio=(nm,v)=>{ if(v){ const o=document.querySelector('input[name="'+nm+'"][value="'+v+'"]'); if(o)o.checked=true; } };
   setRadio('practice',s.__practice); setRadio('office',s.__office);
-  [['matter','__matters'],['prereq','__prereq'],['bkDebtType','__bkDebtType'],['epNeed','__epNeed']].forEach(([nm,key])=>{
+  [['matter','__matters'],['bkDebtType','__bkDebtType'],['epNeed','__epNeed']].forEach(([nm,key])=>{
     document.querySelectorAll('input[name="'+nm+'"]').forEach(c=>{ c.checked=(s[key]||[]).includes(c.value); });
   });
   syncAll();
