@@ -467,7 +467,11 @@ function addPerson(){
     </div>
     <label>Prior petitions filed? <span class="hint">(type, year, outcome)</span></label><input type="text" class="p-petitions">
     <label>Children? (#, ages, country of birth — and is any child a U.S. citizen 21+?)</label>
-    <input type="text" class="p-kids" placeholder="e.g., 2 kids (13, 11) born in U.S. — or: son 24, USC">`;
+    <input type="text" class="p-kids" placeholder="e.g., 2 kids (13, 11) born in U.S. — or: son 24, USC">
+    <label>Ever been arrested? <span class="hint">(any country)</span></label>
+    <select class="p-arrest"><option>No</option><option>Yes</option></select>
+    <div class="pw-arrest" style="display:none"><label>If yes — when, where, why, and what happened?</label>
+      <input type="text" class="p-arrestDetail" placeholder="e.g., 2019, Los Angeles, DUI — case dismissed"></div>`;
   $('people').appendChild(div);
   syncPerson(div);
 }
@@ -483,7 +487,8 @@ function peopleData(){
     anum:p.querySelector('.p-anum').value.trim(),
     hearing:p.querySelector('.p-hearing').value.trim(), masters:p.querySelector('.p-masters').value.trim(),
     marital:p.querySelector('.p-marital').value.trim(), spouse:p.querySelector('.p-spouse').value.trim(),
-    petitions:p.querySelector('.p-petitions').value.trim(), kids:p.querySelector('.p-kids').value.trim()
+    petitions:p.querySelector('.p-petitions').value.trim(), kids:p.querySelector('.p-kids').value.trim(),
+    arrest:p.querySelector('.p-arrest').value, arrestDetail:p.querySelector('.p-arrestDetail').value.trim()
   }));
 }
 
@@ -530,6 +535,7 @@ function syncPerson(p){
   const stopped=(p.querySelector('.p-stopped')||{}).value;
   show('.pw-depdetail', stopped && stopped!=='No');
   show('.pw-court',    matters().includes('court') || val('inRemoval')==='Yes');
+  show('.pw-arrest',   (p.querySelector('.p-arrest')||{}).value==='Yes');
   const dv=p.querySelector('.depverdict');
   if(dv){
     if(!stopped || stopped==='No') dv.textContent='';
@@ -638,6 +644,7 @@ function evaluateImmigration(){
   else if(unclearStop) actions.push('Removal history unclear — they can still book; do NOT promise an outcome (use the non-promissory wording). Confirm later via A-number / FOIA.');
 
   if(m.includes('court')) flags.push('Court/removal case — confirm timeline & capacity');
+  if(ppl.some(p=>p.arrest==='Yes')) flags.push('Arrest / criminal history — attorney review for admissibility & deportability');
   priorAttyFlag(flags);
 
   let outcome, priority='Standard';
@@ -792,6 +799,7 @@ function buildNoteImmigration(r){
     if(p.spouse) L.push(`Spouse/partner: ${p.spouse}`);
     if(p.petitions) L.push(`Prior petitions filed? ${p.petitions}`);
     if(p.kids) L.push(`Children: ${p.kids}`);
+    if(p.arrest==='Yes') L.push(`Arrested: YES — ${p.arrestDetail||'(get when/where/why/outcome)'}`);
     L.push('');
   });
   L.push('— Relief / screening —');
@@ -876,6 +884,7 @@ function applyState(s){
     set('.p-stopped',pd.stopped);set('.p-judge',pd.judge);set('.p-bar',pd.bar);set('.p-held',pd.held);set('.p-false',pd.false);
     set('.p-anum',pd.anum);set('.p-hearing',pd.hearing);set('.p-masters',pd.masters);
     set('.p-marital',pd.marital);set('.p-spouse',pd.spouse);set('.p-petitions',pd.petitions);set('.p-kids',pd.kids);
+    set('.p-arrest',pd.arrest);set('.p-arrestDetail',pd.arrestDetail);
   });
   if(!$('people').children.length) addPerson();
   Object.keys(s).forEach(k=>{ if(k.startsWith('__'))return; const el=$(k); if(!el)return; if(el.type==='checkbox')el.checked=!!s[k]; else el.value=s[k]; });
