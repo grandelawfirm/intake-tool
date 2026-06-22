@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Immigration PNC Qualifier — The Grande Law Firm</title>
+<style>
+  :root{
+    --green:#1a7f37; --green-bg:#e9f7ef;
+    --amber:#9a6700; --amber-bg:#fff4d6;
+    --red:#b42318;  --red-bg:#fdeceb;
+    --ink:#1f2430; --muted:#5b6472; --line:#e3e7ee; --bg:#f5f7fa; --card:#fff;
+    --accent:#2b4eff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       color:var(--ink);background:var(--bg);line-height:1.45;font-size:14px}
+  header{background:#10203f;color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  header h1{font-size:16px;margin:0;font-weight:600}
+  header .tag{font-size:11px;background:#27406e;padding:3px 8px;border-radius:20px;color:#cfe0ff}
+  .privacy{background:#0d8a6a;color:#fff;font-size:12px;padding:6px 20px;text-align:center}
+  .draftbar{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#fff7e6;border-bottom:1px solid #f0d9a0;color:#7a5b00;padding:8px 20px;font-size:13px;flex-wrap:wrap}
+  .wrap{display:grid;grid-template-columns:1fr 420px;gap:18px;max-width:1200px;margin:18px auto;padding:0 18px}
+  @media(max-width:920px){.wrap{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:16px}
+  .card h2{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:0 0 12px}
+  label{display:block;font-weight:600;margin:10px 0 4px;font-size:13px}
+  .hint{font-weight:400;color:var(--muted);font-size:12px;margin-left:4px}
+  input[type=text],input[type=date],select,textarea{width:100%;padding:8px 10px;border:1px solid var(--line);
+      border-radius:8px;font:inherit;background:#fff;color:var(--ink)}
+  textarea{resize:vertical;min-height:54px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  @media(max-width:560px){.row,.row3{grid-template-columns:1fr}}
+  .seg{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+  .seg label{display:inline-flex;align-items:center;gap:6px;font-weight:500;margin:0;border:1px solid var(--line);
+      padding:6px 10px;border-radius:8px;cursor:pointer;background:#fff;font-size:13px}
+  .seg input{margin:0}
+  .seg label:has(input:checked){border-color:var(--accent);background:#eef2ff}
+  .person{border:1px dashed var(--line);border-radius:10px;padding:12px;margin-bottom:12px;background:#fbfcfe}
+  .person h3{margin:0 0 8px;font-size:13px;color:var(--accent)}
+  .btn{appearance:none;border:0;border-radius:9px;padding:10px 16px;font:inherit;font-weight:600;cursor:pointer}
+  .btn-primary{background:var(--accent);color:#fff;width:100%;font-size:15px;padding:13px}
+  .btn-ghost{background:#eef1f6;color:var(--ink)}
+  .btn-sm{padding:6px 10px;font-size:12px}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  /* results */
+  aside{position:sticky;top:14px;align-self:start}
+  .verdict{border-radius:12px;padding:16px;margin-bottom:14px;border:2px solid var(--line)}
+  .verdict.empty{background:#fff;color:var(--muted)}
+  .verdict.go{background:var(--green-bg);border-color:var(--green)}
+  .verdict.maybe{background:var(--amber-bg);border-color:var(--amber)}
+  .verdict.no{background:var(--red-bg);border-color:var(--red)}
+  .verdict .big{font-size:20px;font-weight:800;margin:0 0 6px}
+  .verdict.go .big{color:var(--green)} .verdict.maybe .big{color:var(--amber)} .verdict.no .big{color:var(--red)}
+  .meta{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+  .chip{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:#fff;border:1px solid var(--line)}
+  .reasons{margin:10px 0 0;padding-left:18px}
+  .reasons li{margin:3px 0}
+  .reasons.flag li{color:var(--amber)} .reasons.block li{color:var(--red)}
+  .action{background:#10203f;color:#fff;border-radius:8px;padding:9px 11px;margin-top:10px;font-size:12.5px;font-weight:600}
+  .say{background:#fff;border:1px dashed var(--amber);border-radius:8px;padding:9px 11px;margin-top:10px;font-size:12.5px}
+  .say b{display:block;color:var(--amber);margin-bottom:3px}
+  .warnbox{background:var(--red-bg);border:1px solid var(--red);color:var(--red);border-radius:8px;padding:8px 11px;margin:8px 0;font-size:12.5px}
+  .warnbox ul{margin:4px 0 0;padding-left:18px}
+  .notebox h2{display:flex;justify-content:space-between;align-items:center}
+  #note{min-height:360px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;white-space:pre}
+  .small{font-size:11px;color:var(--muted);margin-top:6px}
+  .depverdict{font-size:12.5px;font-weight:600;color:var(--ink);margin-top:8px}
+  .depverdict:empty{display:none}
+  .req{color:var(--red)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Immigration PNC Qualifier <span class="tag">v1 · internal use only</span></h1>
+  <span class="tag">The Grande Law Firm</span>
+</header>
+<div class="privacy">🔒 Private by design — your entries are never uploaded. A draft is saved only on this computer so you don't lose work mid-call, and it clears when you reset. Works fully offline.</div>
+
+<div class="wrap">
+  <!-- LEFT: FORM -->
+  <main>
+    <div class="toolbar">
+      <button class="btn btn-ghost btn-sm" onclick="addPerson()">+ Add another applicant</button>
+      <button class="btn btn-ghost btn-sm" onclick="resetAll()">↺ Reset / clear</button>
+    </div>
+
+    <div class="card">
+      <h2>Call basics</h2>
+      <div class="row3">
+        <div><label>Office</label>
+          <div class="seg" data-name="office">
+            <label><input type="radio" name="office" value="LA" checked>LA</label>
+            <label><input type="radio" name="office" value="SF">SF</label>
+          </div>
+        </div>
+        <div><label>Appointment type</label>
+          <select id="apptType"><option>Phone</option><option>Zoom</option><option>In-person</option></select>
+        </div>
+        <div><label>Language</label>
+          <select id="language"><option>English</option><option>Spanish</option></select>
+        </div>
+      </div>
+      <div class="row">
+        <div><label>Credit offered? <span class="hint">(fee waived)</span></label>
+          <select id="credit"><option>No</option><option>Yes</option></select></div>
+        <div><label>Source</label><input type="text" id="source" placeholder="Referral / how they heard about us"></div>
+      </div>
+      <div class="row">
+        <div><label>Who is calling? <span class="hint">(full name — verify spelling)</span></label><input type="text" id="caller" placeholder="First &amp; last"></div>
+        <div><label>Calling for themselves, or someone else?</label>
+          <select id="callerRel" onchange="syncCaller()">
+            <option>Self (calling for themselves)</option>
+            <option>Spouse</option>
+            <option>Unmarried partner / significant other</option>
+            <option>Parent</option><option>Child</option><option>Sibling</option>
+            <option>Other relative</option><option>Friend</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="row" id="onBehalfWrap" style="display:none">
+        <div><label>Who needs help? <span class="hint">(full name — verify spelling)</span></label><input type="text" id="whoNeeds" placeholder="First &amp; last"></div>
+        <div><label>Who will attend the appointment?</label><input type="text" id="whoAppt"></div>
+      </div>
+      <label>Where do they live?</label><input type="text" id="location">
+    </div>
+
+    <div class="card">
+      <h2>What kind of help? <span class="hint">(check all that apply)</span></h2>
+      <div class="seg" id="matterTypes">
+        <label><input type="checkbox" name="matter" value="familyBased">Legalize status (family-based)</label>
+        <label><input type="checkbox" name="matter" value="humanitarian">Humanitarian (U-visa, VAWA, SIJ, asylum, TPS)</label>
+        <label><input type="checkbox" name="matter" value="naturalization">Citizenship (N-400)</label>
+        <label><input type="checkbox" name="matter" value="i751">Remove conditions (I-751)</label>
+        <label><input type="checkbox" name="matter" value="court">Court / removal case</label>
+        <label><input type="checkbox" name="matter" value="other">Other</label>
+      </div>
+      <div id="otherWrap" style="display:none"><label>Describe "other"</label><input type="text" id="otherDesc"></div>
+      <label style="margin-top:12px"><input type="checkbox" id="wrongArea"> This matter is outside our practice areas (refer out)</label>
+    </div>
+
+    <div class="card">
+      <h2>Who needs the immigration help? <span class="hint">(the person who wants to apply)</span></h2>
+      <div class="small" style="margin:-4px 0 10px">Fill this out for the person who wants help with their case. If two people both want help — like a husband and wife — add a block for each one.</div>
+      <div id="people"></div>
+    </div>
+
+    <div class="card">
+      <h2>Relief paths <span class="hint">(answer for the principal beneficiary)</span></h2>
+      <div class="row">
+        <div><label>How many times has the PNC been married?</label>
+          <select class="rp" id="marriageCount"><option>Unknown</option><option>0 (never)</option><option>1</option><option>2</option><option>3+</option></select></div>
+        <div><label>Has USC/LPR parents?</label>
+          <select class="rp" id="parentsUSCLPR"><option>Unknown</option><option>Yes — USC</option><option>Yes — LPR</option><option>No</option></select></div>
+      </div>
+      <label>Currently married to a U.S. citizen or LPR?</label>
+      <select class="rp" id="marriedTo" onchange="syncSpouse()">
+        <option>No / not married</option>
+        <option>Yes — U.S. citizen</option>
+        <option>Yes — LPR (green-card holder)</option>
+      </select>
+      <div id="spouseUSCWrap" style="display:none">
+        <label>Spouse is a U.S. citizen by:</label>
+        <select class="rp" id="spouseUSCType" onchange="syncSpouse()">
+          <option>Unknown</option><option>Birth in the U.S.</option><option>Naturalization</option>
+        </select>
+        <div id="spouseNatWrap" style="display:none">
+          <label>If naturalized — how did the spouse first get their green card (LPR)?</label>
+          <input type="text" id="spouseLPRpath" placeholder="e.g., through a parent, prior marriage, asylum, employer…">
+        </div>
+      </div>
+      <div class="row">
+        <div><label>245(i)? <span class="hint">entry & petition before 4/30/2001</span></label>
+          <select class="rp" id="p245i"><option>No</option><option>Unknown</option><option>Yes</option></select></div>
+        <div><label>Spouse/adult child in U.S. military?</label>
+          <select class="rp" id="military"><option>No</option><option>Unknown</option><option>Yes</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>DACA/TPS + traveled on advance parole & re-entered?</label>
+          <select class="rp" id="dacaAP"><option>No</option><option>Unknown</option><option>Yes</option></select></div>
+        <div><label>Currently in removal proceedings?</label>
+          <select class="rp" id="inRemoval"><option>No</option><option>Yes</option></select></div>
+      </div>
+      <label>Abuse — verbal/emotional, financial, or physical — by a USC/LPR spouse, parent, or adult (21+) USC child? <span class="hint">VAWA self-petition</span></label>
+      <select class="rp" id="vawa"><option>No</option><option>Yes</option></select>
+      <div id="vawaDetailsWrap" style="display:none">
+        <label>Who was the abuser, and what kind of abuse? <span class="hint">(verbal / financial / physical)</span></label>
+        <input type="text" id="vawaDetails" placeholder="e.g., USC husband — financial & verbal abuse">
+      </div>
+      <label>Victim of a crime?</label>
+      <select class="rp" id="voc"><option>No</option><option>Yes — the PNC</option><option>Yes — their child under 21</option><option>Yes — their spouse</option></select>
+      <div id="vocReportedWrap" style="display:none">
+        <label>Was it reported to a government agency? <span class="hint">(required for U-visa)</span></label>
+        <select class="rp" id="vocReported"><option>Unknown</option><option>Yes</option><option>No</option></select>
+      </div>
+      <label>Spouse has a 245(i) petition (via sibling/USC parent) AND a visa is now available?</label>
+      <select class="rp" id="spouse245i"><option>No</option><option>Unknown</option><option>Yes</option></select>
+    </div>
+
+    <div class="card" id="asylumCard" style="display:none">
+      <h2>Asylum</h2>
+      <label>Asylum claim?</label><select class="rp" id="asylum"><option>No</option><option>Yes</option></select>
+      <div id="asylumFieldsWrap" style="display:none">
+        <div class="row">
+          <div><label>Fear of return, not purely economic?</label><select class="rp" id="asylumFear"><option>Unknown</option><option>Yes</option><option>No</option></select></div>
+          <div><label>Already filed?</label><select class="rp" id="asylumFiled"><option>Unknown</option><option>Yes</option><option>No</option></select></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="natCard" style="display:none">
+      <h2>N-400 (citizenship) checks</h2>
+      <div class="row">
+        <div><label>LPR long enough?</label>
+          <select class="rp" id="lprTime"><option>Unknown</option><option>5+ years</option><option>3+ years (married to USC)</option><option>Not yet eligible</option></select></div>
+        <div><label>Any trip outside U.S. &gt; 6 months?</label>
+          <select class="rp" id="trips6"><option>No</option><option>Yes</option></select></div>
+      </div>
+      <div class="row3">
+        <div><label>Taxes filed every year?</label><select class="rp" id="taxes"><option>Yes</option><option>No</option></select></div>
+        <div><label>Any arrests?</label><select class="rp" id="arrests"><option>No</option><option>Yes</option></select></div>
+        <div><label>Ever claimed USC / voted?</label><select class="rp" id="falseUSC"><option>No</option><option>Yes</option></select></div>
+      </div>
+    </div>
+
+    <div class="card" id="i751Card" style="display:none">
+      <h2>I-751 (remove conditions) checks</h2>
+      <div class="row3">
+        <div><label>Has conditional green card?</label><select class="rp" id="condGC"><option>Yes</option><option>No</option></select></div>
+        <div><label>Still married?</label><select class="rp" id="stillMarried"><option>Yes</option><option>No</option></select></div>
+        <div><label>Card expiring soon?</label><select class="rp" id="expiring"><option>Yes</option><option>No</option></select></div>
+      </div>
+    </div>
+
+    <div class="card" id="sijCard" style="display:none">
+      <h2>SIJ — Special Immigrant Juvenile checks</h2>
+      <div class="row3">
+        <div><label>Under 21?</label><select class="rp" id="sijAge"><option>Unknown</option><option>Yes</option><option>No</option></select></div>
+        <div><label>Unmarried?</label><select class="rp" id="sijUnmarried"><option>Unknown</option><option>Yes</option><option>No</option></select></div>
+        <div><label>Juvenile court order? <span class="hint">(abuse/abandonment/neglect by a parent)</span></label>
+          <select class="rp" id="sijOrder"><option>No</option><option>Unknown</option><option>Yes — has order</option><option>Not yet — may qualify</option></select></div>
+      </div>
+      <div class="small">SIJ = under 21 + unmarried + a state juvenile court order finding abuse, abandonment, or neglect by one/both parents. The firm can help with the I-360.</div>
+    </div>
+
+    <div class="card" id="courtCard" style="display:none">
+      <h2>Court / removal checks</h2>
+      <label>Is the <b>individual hearing</b> less than 1 month away? <span class="hint">(if yes → too late)</span></label>
+      <select class="rp" id="indHearingSoon"><option>No / N/A</option><option>Yes</option></select>
+      <div class="small">Capture exact hearing dates & # of master hearings in the person block above.</div>
+    </div>
+
+    <div class="card">
+      <h2>Compliance & wrap-up</h2>
+      <label>Prior / current attorney on this matter? <span class="hint">(asked every case)</span></label>
+      <input type="text" id="priorAtty" placeholder="Name, or 'None'">
+      <div class="row">
+        <div><label>Conflict check — adverse party name(s)</label><input type="text" id="adverse"></div>
+        <div><label>Definite conflict found?</label><select class="rp" id="conflict"><option>No</option><option>Yes</option></select></div>
+      </div>
+      <label>Pain point / goal</label><textarea id="goal"></textarea>
+      <div class="row3">
+        <div><label>Best time to contact</label><input type="text" id="bestTime"></div>
+        <div><label>ARAG Member ID</label><input type="text" id="aragId" placeholder="NA"></div>
+        <div><label>ARAG Case Assist #</label><input type="text" id="aragCase" placeholder="NA"></div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="run()">Get recommendation &amp; build note</button>
+    <div class="small">This tool guides scheduling only — it is not legal advice. Anything uncertain routes to the attorney.</div>
+  </main>
+
+  <!-- RIGHT: RESULTS -->
+  <aside>
+    <div id="verdict" class="verdict empty">
+      <div class="big">Awaiting input</div>
+      <div>Fill the form and press <b>Get recommendation</b>.</div>
+    </div>
+
+    <div class="card notebox">
+      <h2>Lawmatics note
+        <button class="btn btn-ghost btn-sm" onclick="copyNote(this)">📋 Copy</button>
+      </h2>
+      <textarea id="note" readonly placeholder="Your copy-paste-ready intake note will appear here."></textarea>
+      <div class="small">Paste straight into Lawmatics (and any future CRM — it's just text).</div>
+    </div>
+  </aside>
+</div>
+
+<script>
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const val = id => ($(id)?.value || '').trim();
+const radio = name => (document.querySelector(`input[name="${name}"]:checked`)||{}).value || '';
+const matters = () => [...document.querySelectorAll('input[name="matter"]:checked')].map(c=>c.value);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---------- dynamic people ---------- */
+let pCount = 0;
+function addPerson(){
+  pCount++;
+  const div = document.createElement('div');
+  div.className='person'; div.dataset.idx=pCount;
+  div.innerHTML = `
+    <h3>Applicant ${pCount} <span class="hint" style="font-weight:400">— the person who needs help</span> <button class="btn btn-ghost btn-sm" style="float:right" onclick="this.closest('.person').remove();syncAll()">remove</button></h3>
+    <div class="row">
+      <div><label>Full name — first &amp; last <span class="hint">(confirm the spelling)</span></label><input type="text" class="p-name" placeholder="First & last — verify spelling"></div>
+      <div><label>Country of birth</label><input type="text" class="p-cob"></div>
+    </div>
+    <div class="row">
+      <div><label>How did they LAST enter?</label>
+        <select class="p-entry">
+          <option value="">—</option>
+          <option value="With visa / inspected">With a visa (inspected)</option>
+          <option value="Waved through (inspected, no visa)">Waved through by an officer — no visa (INSPECTED, not EWI)</option>
+          <option value="Parole (advance parole / CBP One / humanitarian)">Parole — advance parole, CBP One app, or humanitarian parole (INSPECTED / admitted)</option>
+          <option value="TRUE EWI (no officer saw them)">TRUE EWI — no officer saw them</option>
+          <option value="Already LPR / USC">Already LPR / USC</option>
+        </select>
+      </div>
+      <div><label>Date of last entry</label><input type="text" class="p-dates" placeholder="month / year"></div>
+    </div>
+    <div class="pw-overstay" style="display:none"><label>Did they overstay the visa? <span class="hint">(multiple visa entries are fine if no overstay)</span></label>
+      <select class="p-overstay"><option>Unknown</option><option>No — left on time / still in status</option><option>Yes — overstayed</option></select></div>
+    <label>Entered more than once?</label><select class="p-multi"><option>No</option><option>Yes</option></select>
+    <div class="pw-history" style="display:none"><label>How many times, and when did they leave &amp; come back each time?</label>
+      <input type="text" class="p-history" placeholder="e.g., visa 2005 → left 2008 → re-entered 2009 (visa); or EWI 2001 & 2009"></div>
+    <label>Has immigration ever stopped, detained, sent them back, or removed them? <span class="hint">(many people say "deported" for a simple turn-around at the border — that's a "return," not a deportation; the next questions sort it out, so you don't have to)</span></label>
+    <select class="p-stopped"><option value="No">No</option><option value="Yes">Yes</option><option value="Unsure">Unsure</option></select>
+    <div class="pw-depdetail" style="display:none">
+      <div class="row">
+        <div><label>Did they see an immigration judge, or sign removal/deportation papers?</label><select class="p-judge"><option>No</option><option>Yes</option><option>Unsure</option></select></div>
+        <div><label>Did they get a paper barring return for a number of years (5 / 10 / 20)?</label><select class="p-bar"><option>No</option><option>Yes</option><option>Unsure</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>How long were they held?</label><select class="p-held"><option value="">—</option><option>A few hours</option><option>Overnight to a few days</option><option>Weeks or more</option><option>Unsure</option></select></div>
+        <div><label>Did they present FALSE documents? <span class="hint">(someone else's papers)</span></label><select class="p-false"><option>No</option><option>Yes</option></select></div>
+      </div>
+      <div class="depverdict small"></div>
+    </div>
+    <label>A-number <span class="hint">(if in court / prior case)</span></label><input type="text" class="p-anum">
+    <div class="pw-court" style="display:none">
+      <div class="row">
+        <div><label>Hearing info (master/individual, date, judge, court)</label><input type="text" class="p-hearing"></div>
+        <div><label># of master hearings so far</label><input type="text" class="p-masters"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div><label>Marital status <span class="hint">(single / married since… / unmarried partner)</span></label><input type="text" class="p-marital" placeholder="Married since 2012 / single / partner (not married)"></div>
+      <div><label>Spouse / partner — name &amp; immigration status <span class="hint">(USC / LPR / DACA / undoc.)</span></label><input type="text" class="p-spouse" placeholder="e.g., Ana Cano — DACA recipient"></div>
+    </div>
+    <label>Prior petitions filed? <span class="hint">(type, year, outcome)</span></label><input type="text" class="p-petitions">
+    <label>Children? (#, ages, country of birth — and is any child a U.S. citizen 21+?)</label>
+    <input type="text" class="p-kids" placeholder="e.g., 2 kids (13, 11) born in U.S. — or: son 24, USC">`;
+  $('people').appendChild(div);
+  syncPerson(div);
+}
+function peopleData(){
+  return [...document.querySelectorAll('.person')].map(p=>({
+    name:p.querySelector('.p-name').value.trim(), cob:p.querySelector('.p-cob').value.trim(),
+    entry:p.querySelector('.p-entry').value,
+    dates:p.querySelector('.p-dates').value.trim(),
+    overstay:p.querySelector('.p-overstay').value,
+    multi:p.querySelector('.p-multi').value,
+    history:p.querySelector('.p-history').value.trim(),
+    stopped:p.querySelector('.p-stopped').value, judge:p.querySelector('.p-judge').value, bar:p.querySelector('.p-bar').value, held:p.querySelector('.p-held').value, false:p.querySelector('.p-false').value,
+    anum:p.querySelector('.p-anum').value.trim(),
+    hearing:p.querySelector('.p-hearing').value.trim(), masters:p.querySelector('.p-masters').value.trim(),
+    marital:p.querySelector('.p-marital').value.trim(), spouse:p.querySelector('.p-spouse').value.trim(),
+    petitions:p.querySelector('.p-petitions').value.trim(), kids:p.querySelector('.p-kids').value.trim()
+  }));
+}
+
+/* ---------- show/hide cards by matter type ---------- */
+function syncCards(){
+  const m = matters();
+  $('natCard').style.display    = m.includes('naturalization') ? '' : 'none';
+  $('i751Card').style.display   = m.includes('i751') ? '' : 'none';
+  $('sijCard').style.display    = m.includes('humanitarian') ? '' : 'none';
+  $('asylumCard').style.display = (m.includes('humanitarian') || m.includes('court')) ? '' : 'none';
+  $('courtCard').style.display  = m.includes('court') ? '' : 'none';
+  $('otherWrap').style.display  = m.includes('other') ? '' : 'none';
+}
+function syncSpouse(){
+  const mt=val('marriedTo');
+  $('spouseUSCWrap').style.display = mt==='Yes — U.S. citizen' ? '' : 'none';
+  $('spouseNatWrap').style.display = (mt==='Yes — U.S. citizen' && val('spouseUSCType')==='Naturalization') ? '' : 'none';
+}
+function syncRelief(){
+  const t=(id,cond)=>{ const e=$(id); if(e) e.style.display=cond?'':'none'; };
+  t('vocReportedWrap', val('voc')!=='No');
+  t('vawaDetailsWrap', val('vawa')==='Yes');
+  t('asylumFieldsWrap', val('asylum')==='Yes');
+}
+function syncPerson(p){
+  const show=(c,cond)=>{ const e=p.querySelector(c); if(e) e.style.display=cond?'':'none'; };
+  show('.pw-overstay', (p.querySelector('.p-entry')||{}).value==='With visa / inspected');
+  show('.pw-history',  (p.querySelector('.p-multi')||{}).value==='Yes');
+  const stopped=(p.querySelector('.p-stopped')||{}).value;
+  show('.pw-depdetail', stopped && stopped!=='No');
+  show('.pw-court',    matters().includes('court') || val('inRemoval')==='Yes');
+  const dv=p.querySelector('.depverdict');
+  if(dv){
+    if(!stopped || stopped==='No') dv.textContent='';
+    else{
+      const jv=(p.querySelector('.p-judge')||{}).value, bv=(p.querySelector('.p-bar')||{}).value, held=(p.querySelector('.p-held')||{}).value, fd=(p.querySelector('.p-false')||{}).value;
+      if(jv==='Yes'||bv==='Yes'||held==='Weeks or more')
+        dv.textContent='→ Looks like a REMOVAL / deportation order — serious; routes to attorney review.';
+      else if(fd==='Yes')
+        dv.textContent='→ FALSE documents — do not assume a "return"; could be an expedited removal / fraud finding. They can still book — flag for the attorney; a FOIA is likely needed.';
+      else if(jv==='No'&&bv==='No'&&(held==='A few hours'||held==='Overnight to a few days'))
+        dv.textContent='→ Looks like a "return" (turned around at the border) — generally not a removal bar.';
+      else if(stopped==='Unsure'||jv==='Unsure'||bv==='Unsure'||held==='Unsure')
+        dv.textContent='→ Unclear — confirm whether there was a removal order; routing to attorney review to be safe.';
+      else
+        dv.textContent='→ Answer the three questions above and the tool will classify this.';
+    }
+  }
+}
+function syncCaller(){ $('onBehalfWrap').style.display = (val('callerRel')!=='Self (calling for themselves)') ? '' : 'none'; }
+function syncAll(){ syncCards(); syncCaller(); syncSpouse(); syncRelief(); document.querySelectorAll('.person').forEach(syncPerson); }
+document.addEventListener('change', syncAll);
+function liveRun(){ if(matters().length) run(); }
+document.addEventListener('change', liveRun);
+document.addEventListener('input', liveRun);
+
+/* ---------- decision engine ---------- */
+function evaluate(){
+  const m = matters();
+  const ppl = peopleData();
+  const paths=[], flags=[], blockers=[], actions=[], warnings=[];
+  const yes = v => v==='Yes';
+  if(!val('source')) warnings.push('Source is blank — capture how they heard about us');
+  if(ppl.some(p=>p.entry==='With visa / inspected' && p.overstay==='Unknown')) warnings.push('Visa overstay is Unknown — confirm whether they overstayed');
+
+  // hard blockers
+  if($('wrongArea').checked) blockers.push('Matter is outside the firm’s practice areas');
+  if(val('conflict')==='Yes') blockers.push('Definite conflict of interest');
+  if(m.includes('court') && val('indHearingSoon')==='Yes')
+    blockers.push('Individual hearing is under 1 month away — too late to prepare');
+
+  // entry analysis across people
+  const trueEWI = ppl.filter(p=>p.entry.startsWith('TRUE EWI'));
+  const multiEWI = trueEWI.some(p=>p.multi==='Yes');
+  const falseDocs = ppl.some(p=>p.false==='Yes');
+  const priorRemoval = ppl.some(p=> p.stopped==='Yes' && (p.judge==='Yes' || p.bar==='Yes' || p.held==='Weeks or more'));
+  const unclearStop = ppl.some(p=> p.stopped==='Unsure' || (p.stopped==='Yes' && !(p.judge==='Yes'||p.bar==='Yes'||p.held==='Weeks or more') && (p.judge==='Unsure'||p.bar==='Unsure'||p.held==='Unsure'||p.held==='')));
+  const paroleEntry = ppl.some(p=>(p.entry||'').startsWith('Parole'));
+  if(paroleEntry) paths.push('Parole entry (advance parole / CBP One / humanitarian) — inspected/admitted; may allow adjustment of status — worth a session');
+
+  // qualifying relief paths
+  const spouseQ = val('marriedTo').startsWith('Yes');
+  const parentQ = val('parentsUSCLPR').startsWith('Yes');
+  if(m.includes('familyBased') && (spouseQ || parentQ)){
+    const via = spouseQ ? ('spouse — '+(val('marriedTo').includes('citizen')?'USC':'LPR'))
+                        : ('parent — '+(val('parentsUSCLPR').includes('USC')?'USC':'LPR'));
+    paths.push('Family-based: qualifying relative ('+via+')');
+  }
+  if(val('p245i')==='Yes') paths.push('245(i) eligible (pre-4/30/2001 entry + petition)');
+  if(val('military')==='Yes') paths.push('Military family member — parole-in-place avenue');
+  if(val('dacaAP')==='Yes') paths.push('DACA/TPS + advance-parole re-entry (now an inspected entry)');
+  if(val('vawa')==='Yes') paths.push('VAWA — abuse by USC/LPR relative');
+  if(val('spouse245i')==='Yes') paths.push('Derivative via spouse’s 245(i) — visa available');
+
+  const voc = val('voc');
+  if(voc && voc!=='No'){
+    if(val('vocReported')==='Yes') paths.push('U-visa — crime victim, reported to authorities');
+    else flags.push('Crime victim but report to a government agency NOT confirmed — verify (no report = may not qualify)');
+    if(voc.includes('child')||voc.includes('spouse')) paths.push('Derivative U-visa through relative who was the crime victim');
+  }
+  if(val('inRemoval')==='Yes'){ paths.push('In removal proceedings — relief may be available in court'); flags.push('In court — capture A-number & hearing dates'); }
+
+  // N-400
+  if(m.includes('naturalization')){
+    const t = val('lprTime');
+    const eligible = t==='5+ years' || t==='3+ years (married to USC)';
+    const red = [];
+    if(val('trips6')==='Yes') red.push('trip >6 months');
+    if(val('taxes')==='No') red.push('taxes not filed');
+    if(val('arrests')==='Yes') red.push('arrest history');
+    if(val('falseUSC')==='Yes') red.push('claimed USC / voted');
+    if(eligible && red.length===0) paths.push('N-400 — meets basic eligibility');
+    else if(eligible && red.length) { paths.push('N-400 — eligible on time'); flags.push('N-400 good-moral-character issue(s): '+red.join(', ')); }
+    else if(t==='Not yet eligible') flags.push('N-400 — not yet eligible by time; confirm path');
+  }
+
+  // I-751
+  if(m.includes('i751')){
+    if(val('condGC')==='Yes' && val('stillMarried')==='Yes') paths.push('I-751 — standard joint filing');
+    else if(val('condGC')==='Yes' && val('stillMarried')==='No') flags.push('I-751 — no longer married → waiver analysis');
+  }
+
+  // SIJ (humanitarian)
+  if(m.includes('humanitarian')){
+    if(val('sijAge')==='Yes' && val('sijUnmarried')==='Yes' && (val('sijOrder')==='Yes — has order' || val('sijOrder')==='Not yet — may qualify'))
+      paths.push('SIJ — under 21, unmarried, juvenile court order (abuse/abandonment/neglect)');
+    else if(val('sijAge')==='Yes' && val('sijUnmarried')!=='No' && (val('sijOrder')==='No' || val('sijOrder')==='Unknown'))
+      flags.push('Possible SIJ — under 21; confirm juvenile court order (abuse/abandonment/neglect)');
+  }
+
+  // Asylum
+  if(val('asylum')==='Yes'){
+    if(val('asylumFear')==='Yes'){ paths.push('Asylum — fear-based claim'); flags.push('Asylum strength needs attorney evaluation'); }
+    else if(val('asylumFear')==='No') flags.push('Asylum appears economic-only — likely not a qualifying basis');
+    if(val('asylumFiled')==='No') actions.push('Asylum NOT filed → email CG for assessment');
+  }
+
+  // EWI complications
+  if(multiEWI){
+    flags.push('Multiple TRUE EWI entries — permanent-bar timing analysis needed (capture entry dates & detention)');
+  }
+  if(falseDocs){
+    actions.push('Flag for attorney: FALSE documents in history — do NOT treat as a simple return; FOIA likely needed (possible expedited removal / fraud). They can still book.');
+  }
+  if(priorRemoval) flags.push('Prior removal order / 5-year-bar — bar & waiver analysis');
+  else if(unclearStop) flags.push('Immigration stop with unclear outcome — confirm removal order vs. return');
+
+  // court (LA bookable per rule; SF asylum/removal → VH)
+  if(m.includes('court')) flags.push('Court/removal case — confirm timeline & capacity');
+
+  // prior attorney (flag, never blocks)
+  const pa = val('priorAtty');
+  if(pa && !/^none$|^n\/?a$|^no$/i.test(pa)) flags.push('Prior/current attorney ("'+pa+'") — verify representation status before proceeding');
+
+  // ---- outcome ----
+  let outcome, priority='Standard';
+  if(blockers.length){ outcome='no'; }
+  else if(paths.length){ outcome = flags.length ? 'maybe' : 'go'; priority = (outcome==='go') ? 'High' : 'Standard'; }
+  else { outcome='maybe'; } // no clear path, no hard blocker → may book, non-promissory
+
+  // strong-case priority bump
+  if(outcome!=='no' && (paths.some(p=>/Family-based|245\(i\)|N-400 — meets|I-751 — standard|Derivative via spouse/.test(p)))) priority='High';
+
+  // routing
+  const office = radio('office');
+  let route = office==='SF' ? 'Valencia (VH)' : 'Cynthia (CG)';
+  if(office==='SF' && (val('asylum')==='Yes' || m.includes('court'))) route='Valencia (VH) — SF asylum/removal';
+
+  return {outcome,priority,route,paths,flags,blockers,actions,warnings,m,ppl,office};
+}
+
+/* ---------- render verdict ---------- */
+function render(r){
+  const v=$('verdict');
+  const titles={go:'✅ SCHEDULE — clear fit',maybe:'🟡 MAY BOOK — attorney review',no:'❌ REFER OUT — not a fit'};
+  v.className='verdict '+r.outcome;
+  let html=`<div class="big">${titles[r.outcome]}</div>`;
+  html+=`<div class="meta"><span class="chip">Route: ${esc(r.route)}</span><span class="chip">Priority: ${esc(r.priority)}</span></div>`;
+  if(r.warnings && r.warnings.length){ html+=`<div class="warnbox"><b>⚠ Get this info before finishing:</b><ul>${r.warnings.map(w=>`<li>${esc(w)}</li>`).join('')}</ul></div>`; }
+  if(r.blockers.length){ html+=`<ul class="reasons block">${r.blockers.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`; }
+  if(r.paths.length){ html+=`<b style="font-size:12px;color:var(--muted)">Why it may qualify</b><ul class="reasons">${r.paths.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`; }
+  if(r.flags.length){ html+=`<b style="font-size:12px;color:var(--muted)">Attorney-review flags</b><ul class="reasons flag">${r.flags.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`; }
+  r.actions.forEach(a=> html+=`<div class="action">⚑ ${esc(a)}</div>`);
+  if(r.outcome==='maybe'){
+    html+=`<div class="say"><b>Say it this way (don’t promise an outcome):</b>
+      EN: “The attorney can review your situation and explain your options.”<br>
+      ES: “La abogada puede revisar su situación y explicarle sus opciones.”</div>`;
+  }
+  if(r.outcome==='go'){
+    html+=`<div class="say" style="border-color:var(--green)"><b style="color:var(--green)">High-priority — offer the soonest slot.</b>
+      Book the 20-min strategy session with ${r.route}.</div>`;
+  }
+  v.innerHTML=html;
+}
+
+/* ---------- build note ---------- */
+function buildNote(r){
+  const L=[];
+  L.push(`${val('apptType')} Appointment`);
+  L.push(`[Payment status line — added by intake/Mirna once paid]`);
+  L.push('');
+  L.push('Intake Notes:');
+  L.push(`${r.office} PNC`);
+  L.push(`Credit Offered? ${val('credit')}`);
+  L.push('');
+  const titles={go:'✅ SCHEDULE',maybe:'🟡 MAY BOOK — attorney review',no:'❌ REFER OUT'};
+  L.push(`QUALIFIER RESULT: ${titles[r.outcome]}  |  ROUTE TO: ${r.route}  |  PRIORITY: ${r.priority}`);
+  if(r.paths.length) L.push(`  Qualifying: ${r.paths.join('; ')}`);
+  if(r.flags.length) L.push(`  Flags: ${r.flags.join('; ')}`);
+  if(r.blockers.length) L.push(`  Refer-out reason: ${r.blockers.join('; ')}`);
+  r.actions.forEach(a=>L.push(`  ⚑ ACTION: ${a}`));
+  r.warnings.forEach(w=>L.push(`  ⚠ GET INFO: ${w}`));
+  L.push('');
+  L.push(`Language: ${val('language')}`);
+  const _self = val('callerRel')==='Self (calling for themselves)';
+  L.push(`Caller: ${val('caller')}${_self?' — calling for themselves':' — calling as: '+val('callerRel')}`);
+  L.push(`Where do they live? ${val('location')}`);
+  L.push(`Source? ${val('source')}`);
+  if(!_self){
+    L.push(`Who needs help? ${val('whoNeeds')}`);
+    if(val('whoAppt')) L.push(`Who will attend the appointment? ${val('whoAppt')}`);
+  }
+  const mt = r.m.map(x=>({familyBased:'Legalize status (family-based)',humanitarian:'Humanitarian (U-visa/VAWA/SIJ/asylum/TPS)',naturalization:'Citizenship (N-400)',i751:'Remove conditions (I-751)',court:'Court/removal',other:'Other: '+val('otherDesc')}[x])).join(', ');
+  L.push(`Type of help: ${mt}`);
+  L.push('');
+  r.ppl.forEach((p,i)=>{
+    L.push(`— Applicant ${i+1}${p.name?': '+p.name:''} —`);
+    if(p.cob) L.push(`Born in: ${p.cob}`);
+    if(p.entry) L.push(`Last entry: ${p.entry}${p.dates?' · date: '+p.dates:''}`);
+    if(p.entry==='With visa / inspected') L.push(`Visa overstay? ${p.overstay}`);
+    if(p.multi==='Yes') L.push(`Entered more than once — history: ${p.history||'(get details)'}`);
+    if(p.stopped && p.stopped!=='No'){
+      const cls=(p.judge==='Yes'||p.bar==='Yes'||p.held==='Weeks or more')?'likely REMOVAL/deportation order (serious)':'likely a "return" (not a removal)';
+      L.push(`Immigration stop: ${p.stopped} — ${cls}${p.judge==='Yes'?' · saw judge/order':''}${p.bar==='Yes'?' · entry-bar paper':''}${p.held&&p.held!=='Unsure'?' · held: '+p.held:''}${p.false==='Yes'?' · FALSE DOCS: YES':''}`);
+    }
+    if(p.anum) L.push(`A-number: ${p.anum}`);
+    if(p.hearing||p.masters) L.push(`Hearing info: ${p.hearing}${p.masters?' · # masters: '+p.masters:''}`);
+    if(p.marital) L.push(`Marital status: ${p.marital}`);
+    if(p.spouse) L.push(`Spouse/partner: ${p.spouse}`);
+    if(p.petitions) L.push(`Prior petitions filed? ${p.petitions}`);
+    if(p.kids) L.push(`Children: ${p.kids}`);
+    L.push('');
+  });
+  L.push('— Relief / screening —');
+  const rp=(lbl,id)=>{const x=val(id); if(x && !/^no\/unknown$|^unknown$|^no$/i.test(x)) L.push(`${lbl}: ${x}`);};
+  if(val('marriageCount') && val('marriageCount')!=='Unknown') L.push(`# times married: ${val('marriageCount')}`);
+  if(val('marriedTo')!=='No / not married'){
+    let sp=`Married to: ${val('marriedTo')}`;
+    if(val('marriedTo')==='Yes — U.S. citizen'){ sp+=` — USC by ${val('spouseUSCType')||'?'}`; if(val('spouseUSCType')==='Naturalization') sp+=`; spouse got LPR via: ${val('spouseLPRpath')||'?'}`; }
+    L.push(sp);
+  }
+  rp('USC/LPR parents','parentsUSCLPR');
+  rp('245(i)','p245i'); rp('Military family','military'); rp('DACA/TPS + advance parole','dacaAP');
+  rp('In removal proceedings','inRemoval'); rp('VAWA abuse','vawa');
+  if(val('vawa')==='Yes') L.push(`VAWA abuse details: ${val('vawaDetails')||'—'}`);
+  if(val('voc')!=='No') L.push(`VOC: ${val('voc')} · reported? ${val('vocReported')}`);
+  rp('Spouse 245(i), visa available','spouse245i');
+  if(val('asylum')==='Yes') L.push(`Asylum: Yes · fear (not economic)? ${val('asylumFear')} · filed? ${val('asylumFiled')}`);
+  if(r.m.includes('naturalization')) L.push(`N-400: LPR ${val('lprTime')} · trip>6mo ${val('trips6')} · taxes ${val('taxes')} · arrests ${val('arrests')} · claimed USC/voted ${val('falseUSC')}`);
+  if(r.m.includes('i751')) L.push(`I-751: conditional GC ${val('condGC')} · still married ${val('stillMarried')} · expiring ${val('expiring')}`);
+  if(r.m.includes('humanitarian') && val('sijAge')!=='Unknown') L.push(`SIJ: under 21 ${val('sijAge')} · unmarried ${val('sijUnmarried')} · juvenile court order ${val('sijOrder')}`);
+  L.push('');
+  L.push(`Prior attorneys? ${val('priorAtty')||'—'}`);
+  if(val('adverse')) L.push(`Conflict check — adverse party: ${val('adverse')}`);
+  L.push(`Pain point/goal? ${val('goal')}`);
+  L.push(`Best time to contact PNC? ${val('bestTime')}`);
+  L.push(`ARAG Member ID number? ${val('aragId')||'NA'}`);
+  L.push(`ARAG Case Assist number? ${val('aragCase')||'NA'}`);
+  return L.join('\n');
+}
+
+function run(){ const r=evaluate(); render(r); $('note').value=buildNote(r); }
+function copyNote(b){ const t=$('note'); if(!t.value) return; navigator.clipboard.writeText(t.value).then(()=>{ const o=b.textContent; b.textContent='✓ Copied'; setTimeout(()=>b.textContent=o,1200); }); }
+function resetAll(){ if(!confirm('Clear everything and start a new PNC?')) return; document.querySelectorAll('input,select,textarea').forEach(el=>{ if(el.type==='checkbox'||el.type==='radio'){ el.checked = (el.value==='LA'||el.value==='The caller'); } else el.value=''; }); document.querySelectorAll('select').forEach(s=>s.selectedIndex=0); $('people').innerHTML=''; pCount=0; addPerson(); syncAll(); $('verdict').className='verdict empty'; $('verdict').innerHTML='<div class="big">Awaiting input</div><div>Fill the form and press <b>Get recommendation</b>.</div>'; $('note').value=''; clearDraft(); }
+
+/* ---------- draft auto-save (local only, never uploaded) ---------- */
+const DRAFT_KEY='gl_immig_draft_v1';
+function collectState(){
+  const s={};
+  document.querySelectorAll('input[id],select[id],textarea[id]').forEach(el=>{ s[el.id]= el.type==='checkbox'?el.checked:el.value; });
+  s.__matters=matters(); s.__office=radio('office'); s.__people=peopleData();
+  return s;
+}
+function applyState(s){
+  $('people').innerHTML=''; pCount=0;
+  (s.__people||[]).forEach(pd=>{ addPerson(); const p=$('people').lastElementChild;
+    const set=(c,v)=>{ const e=p.querySelector(c); if(e&&v!=null) e.value=v; };
+    set('.p-name',pd.name);set('.p-cob',pd.cob);set('.p-entry',pd.entry);set('.p-dates',pd.dates);
+    set('.p-overstay',pd.overstay);set('.p-multi',pd.multi);set('.p-history',pd.history);
+    set('.p-stopped',pd.stopped);set('.p-judge',pd.judge);set('.p-bar',pd.bar);set('.p-held',pd.held);set('.p-false',pd.false);
+    set('.p-anum',pd.anum);set('.p-hearing',pd.hearing);set('.p-masters',pd.masters);
+    set('.p-marital',pd.marital);set('.p-spouse',pd.spouse);set('.p-petitions',pd.petitions);set('.p-kids',pd.kids);
+  });
+  if(!$('people').children.length) addPerson();
+  Object.keys(s).forEach(k=>{ if(k.startsWith('__'))return; const el=$(k); if(!el)return; if(el.type==='checkbox')el.checked=!!s[k]; else el.value=s[k]; });
+  document.querySelectorAll('input[name="matter"]').forEach(c=>{ c.checked=(s.__matters||[]).includes(c.value); });
+  if(s.__office){ const o=document.querySelector('input[name="office"][value="'+s.__office+'"]'); if(o)o.checked=true; }
+  syncAll();
+}
+let _saveT;
+function autosave(){ clearTimeout(_saveT); _saveT=setTimeout(()=>{ try{ localStorage.setItem(DRAFT_KEY, JSON.stringify({ts:new Date().toISOString(), s:collectState()})); }catch(e){} }, 400); }
+function clearDraft(){ try{ localStorage.removeItem(DRAFT_KEY); }catch(e){} }
+function checkDraft(){
+  let raw; try{ raw=localStorage.getItem(DRAFT_KEY); }catch(e){ return; }
+  if(!raw) return; let d; try{ d=JSON.parse(raw); }catch(e){ return; }
+  if(!d||!d.s) return;
+  const when = d.ts ? new Date(d.ts).toLocaleString() : 'earlier';
+  const bar=document.createElement('div'); bar.className='draftbar';
+  bar.innerHTML='<span>📝 An unsaved draft was found ('+esc(when)+'). Restore your progress?</span><span><button class="btn btn-primary btn-sm" id="rBtn">Restore</button> <button class="btn btn-ghost btn-sm" id="dBtn">Discard</button></span>';
+  const pv=document.querySelector('.privacy'); pv.parentNode.insertBefore(bar, pv.nextSibling);
+  document.getElementById('rBtn').onclick=()=>{ applyState(d.s); bar.remove(); };
+  document.getElementById('dBtn').onclick=()=>{ clearDraft(); bar.remove(); };
+}
+document.addEventListener('input', autosave);
+document.addEventListener('change', autosave);
+
+/* init */
+addPerson(); syncAll(); checkDraft();
+</script>
+</body>
+</html>
