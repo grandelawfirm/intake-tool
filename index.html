@@ -193,6 +193,8 @@
       <div id="vocReportedWrap" style="display:none">
         <label>Was it reported to a government agency? <span class="hint">(required for U-visa)</span></label>
         <select class="rp" id="vocReported"><option>Unknown</option><option>Yes</option><option>No</option></select>
+        <label>What was the crime, when did it happen, and what was the outcome?</label>
+        <input type="text" id="vocDetails" placeholder="e.g., assault in 2021; reported to LAPD; suspect charged / case closed">
       </div>
       <label>Spouse has a 245(i) petition (via sibling/USC parent) AND a visa is now available?</label>
       <select class="rp" id="spouse245i"><option>No</option><option>Unknown</option><option>Yes</option></select>
@@ -624,7 +626,7 @@ function buildNote(r){
   rp('245(i)','p245i'); rp('Military family','military'); rp('DACA/TPS + advance parole','dacaAP');
   rp('In removal proceedings','inRemoval'); rp('VAWA abuse','vawa');
   if(val('vawa')==='Yes') L.push(`VAWA abuse details: ${val('vawaDetails')||'—'}`);
-  if(val('voc')!=='No') L.push(`VOC: ${val('voc')} · reported? ${val('vocReported')}`);
+  if(val('voc')!=='No') L.push(`VOC: ${val('voc')} · reported? ${val('vocReported')}${val('vocDetails')?' · '+val('vocDetails'):''}`);
   rp('Spouse 245(i), visa available','spouse245i');
   if(val('asylum')==='Yes') L.push(`Asylum: Yes · fear (not economic)? ${val('asylumFear')} · filed? ${val('asylumFiled')}`);
   if(r.m.includes('naturalization')) L.push(`N-400: LPR ${val('lprTime')} · trip>6mo ${val('trips6')} · taxes ${val('taxes')} · arrests ${val('arrests')} · claimed USC/voted ${val('falseUSC')}`);
