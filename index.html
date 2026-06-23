@@ -391,7 +391,7 @@
       <div class="card">
         <h2>Bankruptcy — asset screen (Chapter 7)</h2>
         <div class="row">
-          <div><label>High-value or non-exemptable assets? <span class="hint">(multiple vehicles, high-value property)</span></label><select id="bkAssets"><option>No</option><option>Yes</option><option>Unsure</option></select></div>
+          <div><label>High-value or non-exemptable assets? <span class="hint">(e.g., a paid-off home with equity, multiple/expensive vehicles, large non-retirement savings — a 401k/retirement account or a leased car usually does NOT count)</span></label><select id="bkAssets"><option>No</option><option>Yes</option><option>Unsure</option></select></div>
           <div><label>Recent large asset sale? <span class="hint">(proceeds may be too recent)</span></label><select id="bkAssetSale"><option>No</option><option>Yes</option></select></div>
         </div>
         <label>Chapter 11 territory? <span class="hint">(very high assets AND debts)</span></label>
@@ -760,7 +760,9 @@ function evaluateBankruptcy(){
   if(val('conflict')==='Yes') blockers.push('Definite conflict of interest');
 
   const types=checks('bkDebtType');
-  const debt=parseFloat((val('bkDebtAmt')||'').replace(/[^0-9.]/g,''))||0;
+  const _dtxt=(val('bkDebtAmt')||'').toLowerCase().replace(/(\d+(?:\.\d+)?)\s*k\b/g,(m,n)=>String(parseFloat(n)*1000));
+  const _dnums=(_dtxt.match(/[\d,]+(?:\.\d+)?/g)||[]).map(s=>parseFloat(s.replace(/,/g,''))).filter(n=>!isNaN(n));
+  const debt=_dnums.length?Math.max(..._dnums):0;
   const fc=val('bkForeclosure');
   const urgent = val('bkGarnish')==='Yes' || (fc && !/^no(ne)?$|^n\/?a$/i.test(fc));
   const onlyStudent = types.length===1 && types[0]==='Student loans';
@@ -771,7 +773,7 @@ function evaluateBankruptcy(){
   else if(debt>0 && debt<7000 && !urgent) blockers.push('Total debt under $7K — below the threshold to schedule');
 
   if(urgent) paths.push('URGENT — lawsuit/garnishment or foreclosure date present: schedule ASAP');
-  if(debt>=7000 && !onlyStudent && !onlyTax) paths.push('Debt $'+debt.toLocaleString()+' (≥ $7K) with dischargeable debt — qualifies for a session');
+  if(debt>=7000 && !onlyStudent && !onlyTax) paths.push('Debt clears the $7K threshold (dischargeable debt) — qualifies for a session');
   if(!debt && !urgent && !blockers.length) warnings.push('Total debt amount is blank — confirm the estimate ($7K+ to schedule)');
 
   if(office==='NorCal' && val('bkHousing')==='Own') flags.push('NorCal homeowner — if this becomes a Chapter 13, refer out; confirm with VH');
