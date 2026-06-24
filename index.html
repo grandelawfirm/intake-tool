@@ -817,10 +817,10 @@ function evaluate(){ const p=practice(); return p==='bankruptcy'?evaluateBankrup
 /* ---------- render verdict (shared) ---------- */
 function render(r){
   const v=$('verdict');
-  const titles={go:'✅ SCHEDULE — clear fit',maybe:'🟡 MAY BOOK — attorney review',no:'❌ REFER OUT — not a fit'};
+  const titles={go:'✅ SCHEDULE — clear fit',maybe:'🟡 MAY BOOK — attorney reviews at the session',no:'❌ REFER OUT — not a fit'};
   v.className='verdict '+r.outcome;
   let html=`<div class="big">${titles[r.outcome]}</div>`;
-  const signup = r.outcome==='go' ? 'Sign-up: Coordinator can proceed' : r.outcome==='maybe' ? 'Sign-up: Attorney first' : 'Refer out';
+  const signup = r.outcome==='go' ? 'Coordinator can sign up' : r.outcome==='maybe' ? 'Book now — attorney consults at the session' : 'Refer out';
   html+=`<div class="meta"><span class="chip">Route: ${esc(r.route)}</span><span class="chip">Priority: ${esc(r.priority)}</span><span class="chip">${esc(signup)}</span></div>`;
   if(r.warnings && r.warnings.length){ html+=`<div class="warnbox"><b>⚠ Get this info before finishing:</b><ul>${r.warnings.map(w=>`<li>${esc(w)}</li>`).join('')}</ul></div>`; }
   if(r.blockers.length){ html+=`<ul class="reasons block">${r.blockers.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`; }
@@ -828,7 +828,8 @@ function render(r){
   if(r.flags.length){ html+=`<b style="font-size:12px;color:var(--muted)">Attorney-review flags</b><ul class="reasons flag">${r.flags.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`; }
   r.actions.forEach(a=> html+=`<div class="action">⚑ ${esc(a)}</div>`);
   if(r.outcome==='maybe' || r.unclearStop){
-    html+=`<div class="say"><b>Say it this way (don’t promise an outcome):</b>
+    html+=`<div class="say"><b>✅ Book the strategy session now — the attorney reviews the matter during the session. No need to email the attorney to pre-clear it.</b>
+      Say it this way (don’t promise an outcome):<br>
       EN: “The attorney can review your situation and explain your options.”<br>
       ES: “La abogada puede revisar su situación y explicarle sus opciones.”</div>`;
   }
@@ -850,9 +851,9 @@ function noteHead(r, practiceLabel){
   L.push(`Intake by: ${val('intakeBy')||'—'}`);
   L.push(`Credit Offered? ${val('credit')}`);
   L.push('');
-  const titles={go:'✅ SCHEDULE',maybe:'🟡 MAY BOOK — attorney review',no:'❌ REFER OUT'};
+  const titles={go:'✅ SCHEDULE',maybe:'🟡 MAY BOOK — attorney reviews at the session',no:'❌ REFER OUT'};
   L.push(`QUALIFIER RESULT: ${titles[r.outcome]}  |  ROUTE TO: ${r.route}  |  PRIORITY: ${r.priority}`);
-  L.push(`  Sign-up: ${r.outcome==='go'?'Coordinator can proceed':r.outcome==='maybe'?'Attorney first':'Refer out'}`);
+  L.push(`  Next step: ${r.outcome==='go'?'Coordinator can sign up':r.outcome==='maybe'?'Book the session now — attorney reviews AT the session (do NOT email the attorney to pre-clear)':'Refer out'}`);
   if(r.paths.length) L.push(`  Qualifying: ${r.paths.join('; ')}`);
   if(r.flags.length) L.push(`  Flags: ${r.flags.join('; ')}`);
   if(r.blockers.length) L.push(`  Refer-out reason: ${r.blockers.join('; ')}`);
