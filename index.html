@@ -416,6 +416,14 @@
           <div><label>Approx. estate value / assets</label><input type="text" id="epAssets" placeholder="e.g., home + savings ~$400k"></div>
           <div><label>Own real property?</label><select id="epRealProp"><option>No</option><option>Yes</option><option>Unknown</option></select></div>
         </div>
+        <div class="row">
+          <div><label>Additional or out-of-state real property? <span class="hint">(beyond the primary CA residence)</span></label>
+            <select id="epOutOfState"><option>No</option><option>Yes</option><option>Unknown</option></select></div>
+          <div><label>Business interests? <span class="hint">(LLC, corporation, partnership)</span></label>
+            <select id="epBusiness"><option>No</option><option>Yes</option><option>Unknown</option></select></div>
+        </div>
+        <label>Complex or high-net-worth assets? <span class="hint">(multiple properties, large portfolios, out-of-state holdings)</span></label>
+        <select id="epComplex"><option>No</option><option>Yes</option><option>Unknown</option></select>
         <label>Minor children (may need guardianship)?</label><select id="epMinors"><option>No</option><option>Yes</option></select>
         <div class="row">
           <div><label>Is the matter contested or disputed? <span class="hint">(will contest, family dispute, litigation)</span></label>
@@ -423,7 +431,7 @@
           <div><label>Emergency — needed in less than a week?</label>
             <select id="epEmergency"><option>No</option><option>Yes</option></select></div>
         </div>
-        <div class="small">We take <b>simple</b> wills / living-trust / estate-planning needs. <b>Contested</b> matters and <b>emergencies (under a week)</b> refer out.</div>
+        <div class="small">We take <b>simple</b> wills / living-trust / estate-planning needs, and we <b>fund</b> the trust as standard. <b>Contested</b> matters (incl. will contests) and <b>emergencies (under a week)</b> refer out. <b>Additional or out-of-state real property, business interests, and complex / high-net-worth assets</b> are an add-on or referred out &mdash; still book the session; the attorney scopes it there.</div>
       </div>
     </div><!-- /mod-estate -->
 
@@ -799,15 +807,29 @@ function evaluateEstate(){
   if(!val('source')) warnings.push('Source is blank — capture how they heard about us');
   if(val('conflict')==='Yes') blockers.push('Definite conflict of interest');
 
-  if(val('epContested')==='Yes') blockers.push('Contested / disputed matter — refer out (we take simple, uncontested estate planning)');
+  if(val('epContested')==='Yes') blockers.push('Contested / disputed matter (incl. will contest) — refer out (we take simple, uncontested estate planning)');
   if(val('epEmergency')==='Yes') blockers.push('Emergency — needed in under a week — refer out');
   const needs=checks('epNeed');
   paths.push(needs.length ? ('Simple estate planning ('+needs.join(', ')+') — books a planning session') : 'Estate planning inquiry — books a planning session');
   if(val('epMinors')==='Yes') flags.push('Minor children — include guardianship planning (informational)');
+
+  /* Funding scope per the firm's EP 60-Day Launch Plan: additional or out-of-state real
+     property, business interests, and complex / high-net-worth assets are ADD-ON OR
+     REFERRED OUT. These do NOT block the session — book it and let the attorney scope. */
+  let scopeReview=false;
+  if(val('epOutOfState')==='Yes'){ flags.push('Additional or out-of-state real property — each extra CA property deed is a flat add-on; out-of-state property is add-on or refer out — attorney scopes before any quote'); scopeReview=true; }
+  if(val('epOutOfState')==='Unknown') warnings.push('Unclear whether they own property beyond the primary residence — ask before the session');
+  if(val('epBusiness')==='Yes'){ flags.push('Business interests — add-on or refer out per EP scope — attorney reviews before quoting'); scopeReview=true; }
+  if(val('epBusiness')==='Unknown') warnings.push('Business interests unknown — ask before the session');
+  if(val('epComplex')==='Yes'){ flags.push('Complex / high-net-worth assets — add-on or refer out per EP scope — attorney reviews before quoting'); scopeReview=true; }
+  if(val('epComplex')==='Unknown') warnings.push('Asset complexity unknown — ask before the session');
+  if(val('epRealProp')==='Yes') flags.push('Owns CA real property — trust transfer deed triggers Prop 19 / property-tax reassessment review; every deed and funding step needs attorney review');
   priorAttyFlag(flags);
 
-  // EP books simple/uncontested matters; contested or emergency → refer out
-  let outcome = blockers.length ? 'no' : 'go';
+  // EP books simple/uncontested matters; contested or emergency → refer out;
+  // out-of-scope funding assets → book but flag for attorney scoping
+  let outcome = blockers.length ? 'no' : (scopeReview ? 'maybe' : 'go');
+  let priority = outcome==='go' ? 'High' : 'Standard';
 
   return {outcome,priority,route:routeFor(office),paths,flags,blockers,actions,warnings,unclearStop:false,office};
 }
